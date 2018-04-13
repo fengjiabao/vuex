@@ -83,7 +83,7 @@ export default class Socket {
       let cmd = res.cmd
       switch (cmd) {
         case 'meta_definition':
-          console.log(res)
+          xbus.$emit('META-DEF', res)
           break
       }
     })

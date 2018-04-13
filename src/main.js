@@ -12,7 +12,7 @@ import Transer from './js/Transer.js'
 Vue.config.productionTip = false
 Vue.use(Vuex)
 // Vue.component('icon', Icon)
-window.bus = new Vue()
+window.xbus = new Vue()
 /* eslint-disable no-new */
 new Vue({
   // el: '#app',
