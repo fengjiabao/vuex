@@ -1,4 +1,5 @@
 import io from 'socket.io-client'
+import { EVT, CMD } from './Protocol.js'
 
 const url = '127.0.0.1:9000'
 const connectionOpts = {
@@ -82,8 +83,11 @@ export default class Socket {
     this.socket.on('META', (res) => {
       let cmd = res.cmd
       switch (cmd) {
-        case 'meta_definition':
-          xbus.$emit('META-DEF', res)
+        case CMD.META.META_DEF:
+          xdata.commit('metaStore/saveMetaDef', res)
+          break
+        case CMD.META.DATA:
+          xdata.dispatch('metaStore/metaData', res)
           break
       }
     })

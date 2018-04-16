@@ -30,6 +30,7 @@ export default {
       if (!this.sock) {
         this.sock = new Socket()
       }
+      this.dispatch('socketStore/storeSocket', this.sock) // 存储在socketStore中
       this.username = msg.user_name
       this.userpwd = msg.user_pwd
       this.sock.getConnection(3000).then((socket) => {
@@ -57,8 +58,6 @@ export default {
         if (res.code === 0) {
           this.data = res
           let socket = this.sock.socket
-          // this.username = res.data.name
-          // this.roleID = res.data.roleID
           socket.username = res.data.name
           socket.sid = res.data.sid
 
@@ -73,6 +72,7 @@ export default {
             roleid: this.roleID,
             deptid: res.data.deptID
           })
+          xdata.dispatch('dexieDBStore/openLocalDB')
         } else {
           console.warn('用户名 或 密码 错误！')
         }
