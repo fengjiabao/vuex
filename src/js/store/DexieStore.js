@@ -28,7 +28,7 @@ export default {
       for (let i = 0, len = data.length; i < len; i++) {
         let tableGroup = data[i]
         let tableName = tableGroup.tableName
-        xdata.dispatch('metaStore/saveData', {
+        this.dispatch('metaStore/saveData', {
           name: tableName
         })
       }

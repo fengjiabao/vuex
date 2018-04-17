@@ -6,14 +6,14 @@ export default {
   },
   mutations: {
     storeThis (state, msg) {
-      state.socket = msg
+      state.socket = msg.socket
     }
   },
   actions: {
-    storeSocket (state, msg) {
-      state.commit('storeThis', msg)
+    storeSocket ({state, commit}, msg) {
+      commit('storeThis', msg)
     },
-    sendMsg (state, rows) {
+    sendMsg ({state}, rows) {
       let socket = state.socket
       let eventName = rows.cmd
       let msg = rows.data
@@ -39,7 +39,7 @@ export default {
         case 'PULL-DOWN-METADATA':
           dispatch('sendMsg', {
             cmd: EVT.META,
-            data: msg
+            data: data
           })
           break
       }

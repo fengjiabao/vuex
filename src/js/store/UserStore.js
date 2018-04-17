@@ -72,7 +72,6 @@ export default {
             roleid: this.roleID,
             deptid: res.data.deptID
           })
-          xdata.dispatch('dexieDBStore/openLocalDB')
         } else {
           console.warn('用户名 或 密码 错误！')
         }

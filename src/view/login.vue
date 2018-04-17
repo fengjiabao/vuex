@@ -32,13 +32,13 @@ export default {
       textObj: {
         'userObj': {
           type: 'text',
-          icon: 'icon-account',
+          icon: '#icon-account',
           holder: '请输入用户名',
           id: 'username'
         },
         'pwd': {
           type: 'password',
-          icon: 'icon-lock',
+          icon: '#icon-lock',
           holder: '请输入密码',
           id: 'pwd'
         }
@@ -86,15 +86,6 @@ export default {
 </script>
 <style lang="sass">
   @import '../style/defs.sass'
-  html, body 
-    width: 100%
-    height: 100%
-    margin: 0
-    padding: 0
-    font-size: 16px
-  svg
-    width: 1rem
-    height: 1rem
   .page-login 
     width: 100%
     height: 100%

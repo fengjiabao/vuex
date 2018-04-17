@@ -1,7 +1,7 @@
 <template>
   <div :id="items.id">
     <svg class="icon">
-      <use xlink:href="icon"></use>
+      <use :xlink:href="items.icon"></use>
     </svg>
     <input :type="items.type" :placeholder="items.holder" v-on:blur="judgeInput">
   </div>
@@ -30,6 +30,9 @@ export default {
   div
     @include flex-align-item
     height: 3rem
+    .icon
+      fill: $white
+      margin-right: 1rem
     input
       height: 1.5rem
 </style>

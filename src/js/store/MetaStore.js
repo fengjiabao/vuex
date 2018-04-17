@@ -1,4 +1,5 @@
-import specialTable from '../def/special_tablekey_def.js'
+
+import {dealSpecialId} from '../utils/utils.js'
 export default {
   namespaced: true,
   state: {
@@ -15,9 +16,6 @@ export default {
   mutations: {
     saveMetaDef (state, res) {
       state.defs = res.data
-    },
-    dealSpecialId (state, msg) {
-      return specialTable[msg.name] ? specialTable[msg.name] : msg.keyName
     },
     updateDriverData ({state, commit, dispatch}, data) {
       let shiftID = commit('getCurrentShiftID')
@@ -71,7 +69,7 @@ export default {
           if (name.indexOf('dat') < 0) {
             name = `dat_${res.data.name}`
           }
-          xdata.state.dexieDBStore.db[name] ? xdata.state.dexieDBStore.storeDATA(state, {
+          this.state.dexieDBStore.db[name] ? this.dispatch('dexieDBStore/storeDATA', {
             name: name,
             rows: res.data.rows,
             upMethod: res.upMethod
@@ -93,10 +91,7 @@ export default {
       if (rows) {
         let def = state.defs && state.defs[name]
         let keyName = def ? def.fields.names[def.keyIndex] : name + '_id'
-        keyName = commit('dealSpecialId', {
-          keyName: keyName,
-          name: name
-        })
+        keyName = dealSpecialId (name, keyName)
         for (let item of rows) {
         // save to data
           let keyValue = item[keyName]
@@ -118,8 +113,23 @@ export default {
       state.data[name] = tmp
       state.maxIDs[name] = maxID
     },
-    saveData (state, msg) {
-      console.log(msg)
+    async saveData ({state, dispatch}, msg) {
+      // console.log(msg)
+      try {
+        let table = this.state.dexieDBStore.db.table(msg.name) || this.state.dexieDBStore.db[msg.name]
+        let rows = msg.value ? msg.value : await table.toArray()
+        let keyname = msg.name.slice(4)
+        dispatch('saveMetaData', {
+          name: keyname,
+          rows: rows
+        })
+        // this.saveMetaData(keyname, rows)
+        // this.handleTable(keyname, rows)
+        // this.getMdtlength()
+        // this.dealDataByDept()
+      } catch (error) {
+        console.warn(`table ${msg.name} does not exist!`)
+      }
     }
   }
 }

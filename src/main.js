@@ -8,9 +8,11 @@ import Vuex from 'vuex'
 import store from './js/store/DataStore.js'
 import Transer from './js/Transer.js'
 // import Icon from 'vue-svg-icon/Icon.vue'
+// import Icon from 'vue-svg-icon/Icon.vue'
 
 Vue.config.productionTip = false
 Vue.use(Vuex)
+// Vue.use(Icon)
 // Vue.component('icon', Icon)
 window.xbus = new Vue()
 /* eslint-disable no-new */
@@ -26,6 +28,7 @@ new Vue({
 function initBaseServices () {
   window.transer = new Transer('login')
   window.xdata = store
+  window.xdata.dispatch('dexieDBStore/openLocalDB')
 }
 
 window.initApp = () => {

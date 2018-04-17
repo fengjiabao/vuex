@@ -1,12 +1,17 @@
 <template>
   <div id="app">
     <router-view/>
+    <iconSvg></iconSvg>
   </div>
 </template>
 
 <script>
+import iconSvg from './components/icon-svg'
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    iconSvg
+  }
 }
 </script>
 
@@ -20,6 +25,13 @@ html, body {
 * {
   margin: 0;
   padding: 0;
+}
+li {
+  list-style: none
+}
+.icon {
+  width: 1rem;
+  height: 1rem;
 }
 #app {
   width: 100%;

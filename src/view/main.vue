@@ -13,4 +13,11 @@ export default {
   }
 }
 </script>
+<style lang="sass">
+  @import '../style/defs.sass'
+  .main
+    display: flex
+    @include wh(100%, 100%)
+    flex-direction: column
+</style>
 
