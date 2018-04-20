@@ -1,7 +1,7 @@
 <template>
   <div class="short">
     <span v-for="item in badgeItems" :key="item.index" class="shortcut-item hint--bottom-left" :aria-label="item.label">
-      <!-- <icon-badge :id="item.name" :iconname="item.iconName" :mark="alarmCount"></icon-badge> -->
+      <icon-badge :iconobj="item" :id="item.name" :iconname="item.iconName" ></icon-badge>
     </span>
     <span v-for="item in shortcut" :key="item.index" class="shortcut-item hint--bottom-left" :aria-label="item.label">
       <svg class="icon"><use :xlink:href="item.iconName"></use></svg>
@@ -13,6 +13,7 @@
 </template>
 <script>
 import shortcutItems from './js/shortcut_def.js'
+import iconBadge from '../components/icon-badge.vue'
 export default {
   name: 'shortOper',
   data () {
@@ -21,6 +22,9 @@ export default {
       shortcut: shortcutItems.slice(2),
       isFullScreen: false
     }
+  },
+  components: {
+    'icon-badge': iconBadge
   }
 }
 </script>
@@ -28,9 +32,8 @@ export default {
   @import '../style/defs.sass'
   .short
     display: flex
+    border-right: 1px solid $border-color
     .shortcut-item
       margin: 0 .3rem
-    .icon
-      fill: $white
 </style>
 

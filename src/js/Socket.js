@@ -1,5 +1,6 @@
 import io from 'socket.io-client'
 import { EVT, CMD } from './Protocol.js'
+import {toJson} from './utils/utils.js'
 
 const url = '127.0.0.1:9000'
 const connectionOpts = {
@@ -88,6 +89,25 @@ export default class Socket {
           break
         case CMD.META.DATA:
           xdata.dispatch('metaStore/metaData', res)
+          break
+      }
+    })
+
+    this.socket.on(EVT.PUSH, (ress) => {
+      let res = toJson(ress)
+      let cmd = res.cmd
+      let data = res.data
+      if (typeof data === 'string') {
+        try {
+          data = JSON.parse(data)
+        } catch (error) {
+          console.warn('CAN NOT parse the PUSHed JSON data: ', data)
+          return
+        }
+      }
+      switch (cmd) {
+        case 'pos_map':
+          xdata.dispatch('cardStore/cardUpdatePos', data)
           break
       }
     })

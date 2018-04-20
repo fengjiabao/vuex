@@ -123,12 +123,23 @@ export default {
           name: keyname,
           rows: rows
         })
+        dispatch('handleTable', {
+          name: keyname,
+          rows: rows
+        })
         // this.saveMetaData(keyname, rows)
         // this.handleTable(keyname, rows)
         // this.getMdtlength()
         // this.dealDataByDept()
       } catch (error) {
         console.warn(`table ${msg.name} does not exist!`)
+      }
+    },
+    handleTable ({state, dispatch}, msg) {
+      let name = msg.name
+      let rows = msg.rows
+      if (name === 'map_gis') {
+        this.dispatch('mapStore/saveGisMap', rows)
       }
     }
   }

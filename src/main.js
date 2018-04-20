@@ -7,6 +7,7 @@ import router from './router'
 import Vuex from 'vuex'
 import store from './js/store/DataStore.js'
 import Transer from './js/Transer.js'
+
 // import Icon from 'vue-svg-icon/Icon.vue'
 // import Icon from 'vue-svg-icon/Icon.vue'
 

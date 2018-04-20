@@ -4,7 +4,7 @@
     <main-nav :nav="nav"></main-nav>
     <fuzzy-search></fuzzy-search>
     <shortcut-operation></shortcut-operation>
-    <!-- <user-bar></user-bar> -->
+    <user-bar></user-bar>
   </div>
 </template>
 <script>
@@ -12,11 +12,13 @@ import mainNav from './main-nav'
 import mainMenu from './js/main-menu.js'
 import fuzzySearch from './fuzzy-search'
 import shortOper from './shortcut-operation'
+import userBar from '../user/user-bar'
 export default {
   components: {
     'main-nav': mainNav,
     'fuzzy-search': fuzzySearch,
-    'shortcut-operation': shortOper
+    'shortcut-operation': shortOper,
+    'user-bar': userBar
   },
   data () {
     return {

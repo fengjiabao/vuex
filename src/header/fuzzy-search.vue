@@ -1,9 +1,9 @@
 <template>
   <div class="fuzzy-search">
-    <div class="search-type-selector" id="typeselector">{{searchType.label}}</div>
+    <div class="search-type-selector" id="typeselector" @click="showList">{{searchType.label}}</div>
     <div class="search-icon" id="selecticon"><img src="../assets/search.png"></div>
     <div v-show="isShowTypeList" class="popup-list type-panel">
-      <span v-for="stype in typeDef" :key="stype.index" class="list-item" :data-index="stype.index">{{stype.label}}</span>
+      <span v-for="(stype, index) in typeDef" :key="index" class="list-item" @click="changeType($event)" :data-index="index">{{stype.label}}</span>
     </div>
     <input id="searchinput" ref="searchinput" type="search" class="search-box" size="10" :placeholder="searchType.placeholder">
   </div>
@@ -19,6 +19,17 @@ export default {
       ],
       searchType: { key: 'vehicle', id: 2, label: '车辆', prefix: '002', placeholder: '车牌、车牌首字母、卡号' },
       isShowTypeList: false
+    }
+  },
+  methods: {
+    showList () {
+      this.isShowTypeList = !this.isShowTypeList
+    },
+    changeType (evt) {
+      let target = evt.target
+      let index = parseInt(target.getAttribute('data-index'), 10)
+      this.searchType = this.typeDef[index]
+      this.isShowTypeList = false
     }
   }
 }
@@ -43,8 +54,24 @@ export default {
       line-height: 1.4rem
       border-radius: 12px 0 0 12px
       padding: 0 4px
+      cursor: pointer
     .search-icon
       position: absolute
       top: -2px
       right: 4px
+    .popup-list
+      @include wh(5rem, 4rem)
+      @include flex-center-center
+      padding: 1rem
+      color: $font-333
+      @include trbl(1.7rem, 0, 0, 0rem)
+      background: $gray-s
+      z-index: 99
+      span
+        @include wh(100%, 2rem)
+        line-height: 2rem
+        cursor: pointer
+        text-align: center
+        &:hover
+          background: $gray-m
 </style>
