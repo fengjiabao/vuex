@@ -34,7 +34,10 @@ export default {
 
       // Start the animation loop.
       let animationFrameID = requestAnimationFrame(doAnimate)
-      obj.set('rafId', animationFrameID)
+      if (obj && obj.getProperties()) {
+        obj.getProperties().rafId = animationFrameID
+      }
+      // obj.set('rafId', animationFrameID)
       obj.set('xpos', targetPosition)
       obj.set('xtween', tween) // save tween object for stopping it later.
 
@@ -45,7 +48,10 @@ export default {
         // 方案：
         // 1. 如果需要中断当前动画，则设置一个标识，在目标对象的下一次动画帧启动之前，判断是否需要中断动画，如果需要，则把对象移动到目标位置，且不再启动新的动画帧，
         // 2. 让本次动画完成，然后再 tween.onComplete 中启动下一次动画（如果有的话）；
-        obj && obj.set('rafId', animationFrameID)
+        // obj && obj.set('rafId', animationFrameID)
+        if (obj && obj.getProperties()) {
+          obj.getProperties().rafId = animationFrameID
+        }
 
         TWEEN.update()
       }
@@ -78,11 +84,13 @@ export default {
     },
     stopAnimationLoop ({dispatch}, obj) {
       let ret = false
-      let preRaf = obj && obj.get('rafId')
+      // let preRaf = obj && obj.get('rafId')
+      let preRaf = obj && obj.getProperties() && obj.getProperties()['rafId']
       if (preRaf && parseInt(preRaf, 10) > 0) {
       // 取消队列中的 animation frame，就不会执行 doAnimate()，相当于中断了 animation loop。
         cancelAnimationFrame(preRaf)
-        obj.set('rafId', null)
+        // obj.set('rafId', null)
+        obj.getProperties()['rafId'] = null
 
         ret = true
       }
