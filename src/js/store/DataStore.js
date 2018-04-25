@@ -7,6 +7,8 @@ import dexieDBStore from './DexieStore.js'
 import mapStore from './MapStore.js'
 import mapService from '../service/mapService.js'
 import cardStore from './CardStore.js'
+import olMapCardLayer from '../map/OlMapCardLayer.js'
+import olMapAnimator from '../map/OlMapAnimator.js'
 
 Vue.use(Vuex)
 export default new Vuex.Store({
@@ -17,6 +19,8 @@ export default new Vuex.Store({
     dexieDBStore: dexieDBStore,
     mapStore: mapStore,
     mapService: mapService,
-    cardStore: cardStore
+    cardStore: cardStore,
+    olMapCardLayer: olMapCardLayer,
+    olMapAnimator: olMapAnimator
   }
 })

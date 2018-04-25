@@ -11,7 +11,8 @@ export default {
     cardIndex: new Map(),
     driverData: new Map(),
     first: false,
-    CARD_TYPES: ['vehicle_extend', 'staff_extend', 'adhoc']
+    CARD_TYPES: ['vehicle_extend', 'staff_extend', 'adhoc'],
+    defaultMapID: 5
   },
   mutations: {
     saveMetaDef (state, res) {

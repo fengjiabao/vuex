@@ -13,7 +13,7 @@ export default {
   },
   watch: {
     loadMap: function () {
-      console.log('1111')
+      console.log('2222')
       let id = xdata.state.mapStore.defaultMapID
       let map = xdata.state.mapStore.map
       let mapRow = xdata.state.mapStore.row
@@ -27,7 +27,18 @@ export default {
     }
   },
   mounted () {
-    console.log('11111')
+    if (xdata) {
+      let id = xdata.state.mapStore.defaultMapID
+      let map = xdata.state.mapStore.map
+      let mapRow = xdata.state.mapStore.row
+      let dom = this.$el.querySelector('#monitormap')
+      xdata.dispatch('mapService/initMap', {
+        id: id,
+        map: map,
+        mapRow: mapRow,
+        dom: dom
+      })
+    }
   }
 }
 </script>

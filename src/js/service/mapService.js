@@ -114,6 +114,7 @@ export default {
         map: olmap,
         view: view
       })
+      this.commit('olMapCardLayer/initLayers')
     }
   }
 }
