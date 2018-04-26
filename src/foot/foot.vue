@@ -1,5 +1,5 @@
 <template>
-  <div>这是底部</div>
+  <div> this is footer</div>
 </template>
 <style lang="sass" scoped>
   div

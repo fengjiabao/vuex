@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <router-view/>
-    <iconSvg></iconSvg>
-    <iconTips></iconTips>
+    <icon-svg></icon-svg>
+    <icon-tips></icon-tips>
   </div>
 </template>
 

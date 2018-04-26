@@ -1,19 +1,18 @@
 <template>
   <div class="main">
     <head-view></head-view>
-    <middle-view></middle-view>
+    <!-- <middle-view></middle-view> -->
+    <router-view/>
     <foot-view></foot-view>
   </div>
 </template>
 <script>
-import head from '../header/head'
-import middle from '../middle/monitor/sp_monitor'
-import foot from '../foot/foot'
+import headView from '@/header/head'
+import footView from '@/foot/foot'
 export default {
   components: {
-    'head-view': head,
-    'middle-view': middle,
-    'foot-view': foot
+     headView,
+     footView 
   }
 }
 </script>
