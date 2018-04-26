@@ -1,5 +1,5 @@
 
-import {dealSpecialId} from '../utils/utils.js'
+import {dealSpecialId, concatObject} from '../utils/utils.js'
 export default {
   namespaced: true,
   state: {
@@ -10,6 +10,9 @@ export default {
     dataInArray: new Map(),
     cardIndex: new Map(),
     driverData: new Map(),
+    alarm: new Map(),
+    staffs: new Map(),
+    vehicles: new Map(),
     first: false,
     CARD_TYPES: ['vehicle_extend', 'staff_extend', 'adhoc'],
     defaultMapID: 5
@@ -44,6 +47,24 @@ export default {
       }
 
       return shiftID
+    },
+    storeAlarm (state, data) {
+      let name = data.name
+      let value = data.value
+      state.alarm.set(name, value)
+    },
+    // 是否需要过滤部分卡
+    // 被过滤目标不在前端显示,即生效, 目前数据库为0生效
+    updateFilterCardFlag (state) {
+      state.needFilterCards = false // 默认不过滤
+
+      let rules = state.dataInArray.get('rules')
+      let filterCardRules = rules && rules.filter(item => item.name === 'filtercard')
+      let filterCardRule = filterCardRules && filterCardRules[0]
+
+      if (filterCardRule && filterCardRule.status === 0) {
+        state.needFilterCards = true
+      }
     }
   },
   actions: {
@@ -92,7 +113,7 @@ export default {
       if (rows) {
         let def = state.defs && state.defs[name]
         let keyName = def ? def.fields.names[def.keyIndex] : name + '_id'
-        keyName = dealSpecialId (name, keyName)
+        keyName = dealSpecialId(name, keyName)
         for (let item of rows) {
         // save to data
           let keyValue = item[keyName]
@@ -115,7 +136,6 @@ export default {
       state.maxIDs[name] = maxID
     },
     async saveData ({state, dispatch}, msg) {
-      // console.log(msg)
       try {
         let table = this.state.dexieDBStore.db.table(msg.name) || this.state.dexieDBStore.db[msg.name]
         let rows = msg.value ? msg.value : await table.toArray()
@@ -128,20 +148,114 @@ export default {
           name: keyname,
           rows: rows
         })
-        // this.saveMetaData(keyname, rows)
-        // this.handleTable(keyname, rows)
         // this.getMdtlength()
         // this.dealDataByDept()
       } catch (error) {
         console.warn(`table ${msg.name} does not exist!`)
       }
     },
-    handleTable ({state, dispatch}, msg) {
+    async jointObj ({state, dispatch}, type) {
+      let objects = state.dataInArray.get(type)
+      if (objects) {
+        for (let i = 0, len = objects.length; i < len; i++) {
+          let obj = objects[i]
+          let objID = obj[type + '_id']
+          let name = obj.name
+          let spy = await this.dispatch('spell/makePy', name)
+          let brief = spy ? spy[0] : ''
+          obj.spy = brief
+          let objExtend = state.data[type + '_extend'].get(objID)
+          let objInfo = concatObject(obj, objExtend)
+          if (type === 'staff') {
+            state.staffs.set(objID, objInfo)
+          } else if (type === 'vehicle') {
+            state.vehicles.set(objID, objInfo)
+          }
+        }
+      }
+    },
+    handleTable ({state, commit, dispatch}, msg) {
       let name = msg.name
       let rows = msg.rows
       if (name === 'map_gis') {
         this.dispatch('mapStore/saveGisMap', rows)
       }
+      if (name === 'setting') {
+        if (rows) {
+          for (let i = 0, len = rows.length; i < len; i++) {
+            commit('storeAlarm', {
+              name: rows[i].name,
+              value: rows[i].value
+            })
+          }
+        }
+        if (!state.alarm.get('alarm')) {
+          commit('storeAlarm', {
+            name: 'alarm',
+            value: this.state.alarm.defaultAlarmLevel
+          })
+        }
+      }
+      if (name === 'rules') {
+        commit('updateFilterCardFlag')
+      }
+      if (state.data['staff'] && state.data['staff_extend']) {
+        if (!state.staffs.size || state.staffs.size !== state.data.staff.size) {
+          dispatch('jointObj', 'staff')
+        }
+      }
+
+      if (state.data['vehicle'] && state.data['vehicle_extend']) {
+        if (!state.vehicles.size || state.vehicles.size !== state.data.vehicle.size) {
+          dispatch('jointObj', 'vehicle')
+        }
+      }
+    },
+    async getCardInfo ({state}, cardID) {
+      let cards = state.data['card']
+      return cards ? cards.get(cardID) : null
+    },
+    async getCardTypeID ({dispatch}, cardID) {
+      let card = await dispatch('getCardInfo', cardID)
+      return card ? card.card_type_id : -1
+    },
+    async getCardTypeInfo ({state, dispatch}, cardID) {
+      let ret = null
+
+      let cardTypeID = await dispatch('getCardTypeID', cardID)
+      cardTypeID = parseInt(cardTypeID, 10)
+      if (cardTypeID >= 0) {
+        ret = state.data['card_type'] && state.data['card_type'].get(cardTypeID)
+      }
+
+      return ret
+    },
+    async getCardTypeName ({state, dispatch}, cardID) {
+      let typeInfo = await dispatch('getCardTypeInfo', cardID)
+      return typeInfo ? typeInfo.name : undefined
+    },
+    async getCardBindObjectInfo ({state, dispatch}, cardID) { // such as staff or vehicle
+      let cardTypeName = await dispatch('getCardTypeName', cardID)
+      let baseInfoTable = state.data[cardTypeName]
+      if (!baseInfoTable && !state[cardTypeName]) {
+        // this.pullDownMetadata(cardTypeName)
+        baseInfoTable = state.data[cardTypeName]
+      }
+
+      let objExtendInfo = state.cardIndex.get(cardID)
+      if (!objExtendInfo && !state[cardTypeName + '_extend']) {
+        // this.pullDownMetadata(cardTypeName + '_extend')
+        objExtendInfo = state.cardIndex.get(cardID)
+      }
+      let objID = objExtendInfo && objExtendInfo[cardTypeName + '_id']
+
+      let objBaseInfo = baseInfoTable && baseInfoTable.get(objID)
+
+      // 防止如果一张卡触发拉取元数据，但是并未拉取到，每张push来的定位数据卡重复多次拉取元数据
+      state[cardTypeName] = true
+      state[cardTypeName + '_extend'] = true
+
+      return concatObject(objExtendInfo, objBaseInfo)
     }
   }
 }
