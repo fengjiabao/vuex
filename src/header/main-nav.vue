@@ -1,6 +1,10 @@
 <template>
   <ul>
-    <li v-for="item in list" :key="item.index" :id="item.id" :ref="item.name">{{item.label}}</li>
+    <li v-for="item in list" :key="item.index" :id="item.id" :ref="item.name"> 
+      <router-link :to="item.routerPath">
+        {{item.label}}
+      </router-link>
+    </li>
   </ul>
 </template>
 <script>
