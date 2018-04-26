@@ -22,7 +22,7 @@
   </div>
 </template>
 <script>
-import textFile from '../components/text-file.vue'
+import textFile from '@/components/text-file.vue'
 import {mapState} from 'vuex'
 export default {
   name: 'login',
@@ -53,7 +53,7 @@ export default {
   watch: {
     gotoMonitor: function () {
       if (this.$store.state.user.logined) {
-        this.$router.push('/main')
+        this.$router.push('/middle/monitor/sp_monitor')
       }
     }
   },

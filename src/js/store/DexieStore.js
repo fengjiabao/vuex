@@ -133,13 +133,13 @@ export default {
           }
         }).then(() => {
           console.log(`added ${storename.name}`)
-          if (state.storeForceData) {
-            state.forceData.set(name, true)
-            // xbus.trigger('PROGRESS-BAR')
-          }
-          if (state.forceData.size >= this.rows.length) {
-            state.storeForceData = false
-          }
+          // if (state.storeForceData) {
+          //   state.forceData.set(name, true)
+          //   // xbus.trigger('PROGRESS-BAR')
+          // }
+          // if (state.forceData.size >= this.rows.length) {
+          //   state.storeForceData = false
+          // }
         }).catch(e => {
           console.warn(`更新元数据${name}失败`)
         })

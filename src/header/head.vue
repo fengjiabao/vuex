@@ -11,14 +11,14 @@
 import mainNav from './main-nav'
 import mainMenu from './js/main-menu.js'
 import fuzzySearch from './fuzzy-search'
-import shortOper from './shortcut-operation'
+import shortcutOperation from './shortcut-operation'
 import userBar from '../user/user-bar'
 export default {
   components: {
-    'main-nav': mainNav,
-    'fuzzy-search': fuzzySearch,
-    'shortcut-operation': shortOper,
-    'user-bar': userBar
+    mainNav,
+    fuzzySearch,
+    shortcutOperation,
+    userBar
   },
   data () {
     return {
