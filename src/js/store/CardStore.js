@@ -28,6 +28,7 @@ export default {
       if (!data) return
       data = toJson(data)
       dispatch('processVehicleData', data.v)
+      dispatch('processStaffData', data.s)
     },
     async processVehicleData ({state, dispatch}, data) {
       if (!data) {
@@ -36,6 +37,13 @@ export default {
       state.vstate = await dispatch('processStat', data.state)
       state.overview.vehicle = state.vstate ? state.vstate.sum : 0
       state.vcards = await dispatch('processDetail', data.detail)
+    },
+    async processStaffData ({state, dispatch}, data) {
+      if (!data) return
+      state.sStat = await dispatch('processStat', data.stat)
+      state.overview.staff = state.sStat ? state.sStat.sum : 0
+
+      state.scards = await dispatch('processDetail', data.detail)
     },
     processStat ({state, dispatch}, data) {
       let stat = null
@@ -100,9 +108,7 @@ export default {
       return card
     },
     showCard ({dispatch}, data) {
-      let cardID = data.cardID
       let card = data.card
-      // console.log(card)
       this.dispatch('olMapCardLayer/informMapUpdateCard', {
         cmd: 'POSITION',
         card: card
