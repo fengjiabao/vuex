@@ -33,22 +33,32 @@ export default {
       dispatch('drawcard', data)
     },
     async drawcard ({state, dispatch}, data) {
+      console.log(data)
       let cmd = data.cmd
       let card = data.card
       let cardID = card[CARD.card_id]
       let group = await dispatch('getFeature', card)
-      if (group) {
-        dispatch('cardAnimation', {
-          cardID: cardID,
-          group: group,
-          card: card
-        })
-      } else {
-        group = await dispatch('drawCardOn', {
-          card: card,
-          className: 'card-add'
-        })
-        state.groups.set(cardID, group)
+      let type = cmd === 'NOSIGNAL' ? 'nosignal' : null
+      switch (cmd) {
+        case 'POSITION':
+        case 'DOWNMINE':
+        case 'NOSIGNAL': // 丢失信号时如果有坐标变化，也做移动处理，若此时状态还是进入盲区则推送数据问题
+          if (group) {
+            dispatch('cardAnimation', {
+              cardID: cardID,
+              group: group,
+              card: card
+            })
+          } else {
+            group = await dispatch('drawCardOn', {
+              card: card,
+              className: 'card-add',
+              type: type
+            })
+            state.groups.set(cardID, group)
+          }
+          break
+        // case 
       }
     },
     getFeature ({state}, card) {
@@ -61,7 +71,7 @@ export default {
       }
       return feature
     },
-    drawCardOn ({state}, data) {
+    async drawCardOn ({state}, data) {
       let card = data.card
       let cardID = data.card[CARD.card_id]
       let cardTypeName = null
@@ -70,6 +80,9 @@ export default {
       } else {
         cardTypeName = 'vehicle'
       }
+      let cardBindObj = await this.dispatch('metaStore/getCardBindObjectInfo', cardID)
+      // console.log(cardBindObj)
+
       let objectID = card[CARD.object_id]
       let attrs = {
         'card': card,

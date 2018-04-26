@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '../view/login'
-import spMonitor from '@/monitor/sp-monitor'
 import main from '../view/main'
 
 Vue.use(Router)

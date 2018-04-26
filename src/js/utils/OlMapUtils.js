@@ -75,7 +75,7 @@ function createLabelStyle (feature, type, viewZoom, rotation, map) {
     scale: 0.28
   }
   let t = {
-    text: String(feature.get('data-id')),
+    text: String(feature.get('data-number')),
     font: '12px',
     fill: new ol.style.Fill({
       color: 'red'

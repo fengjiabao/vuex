@@ -22,4 +22,12 @@ function toJson (data) {
   return ret
 }
 
-export {dealSpecialId, toJson}
+function concatObject (obj1, obj2) {
+  for (var key in obj2) {
+    if (obj1.hasOwnProperty(key)) continue// 有相同的属性则略过
+    obj1[key] = obj2[key]
+  }
+  return obj1
+}
+
+export {dealSpecialId, toJson, concatObject}
