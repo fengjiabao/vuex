@@ -1,5 +1,6 @@
 
 import {dealSpecialId, concatObject} from '../utils/utils.js'
+import { unregisterDecorator } from 'handlebars';
 export default {
   namespaced: true,
   state: {
@@ -15,7 +16,13 @@ export default {
     vehicles: new Map(),
     first: false,
     CARD_TYPES: ['vehicle_extend', 'staff_extend', 'adhoc'],
-    defaultMapID: 5
+    defaultMapID: 5,
+    bindcard: {
+      cards: null,
+      cardTypeID: null,
+      typeInfo: null,
+      typeInfoName: undefined
+    }
   },
   mutations: {
     saveMetaDef (state, res) {
@@ -65,6 +72,27 @@ export default {
       if (filterCardRule && filterCardRule.status === 0) {
         state.needFilterCards = true
       }
+    },
+    getCardInfo (state, cardID) {
+      let cards = state.data['card']
+      state.bindcard.cards = cards ? cards.get(cardID) : null
+    },
+    getCardTypeID (state) {
+      state.bindcard.cardTypeID = state.bindcard.cards ? state.bindcard.cards.card_type_id : null
+    },
+    getCardTypeInfo (state) {
+      let ret = null
+      let cardTypeID = state.bindcard.cardTypeID
+      cardTypeID = parseInt(cardTypeID, 10)
+      if (cardTypeID >= 0) {
+        ret = state.data['card_type'] && state.data['card_type'].get(cardTypeID)
+      }
+
+      state.bindcard.typeInfo = ret
+    },
+    getCardTypeName (state) {
+      let typeInfo = state.bindcard.typeInfo
+      state.bindcard.typeInfoName = typeInfo ? typeInfo.name : undefined
     }
   },
   actions: {
@@ -211,31 +239,12 @@ export default {
         }
       }
     },
-    async getCardInfo ({state}, cardID) {
-      let cards = state.data['card']
-      return cards ? cards.get(cardID) : null
-    },
-    async getCardTypeID ({dispatch}, cardID) {
-      let card = await dispatch('getCardInfo', cardID)
-      return card ? card.card_type_id : -1
-    },
-    async getCardTypeInfo ({state, dispatch}, cardID) {
-      let ret = null
-
-      let cardTypeID = await dispatch('getCardTypeID', cardID)
-      cardTypeID = parseInt(cardTypeID, 10)
-      if (cardTypeID >= 0) {
-        ret = state.data['card_type'] && state.data['card_type'].get(cardTypeID)
-      }
-
-      return ret
-    },
-    async getCardTypeName ({state, dispatch}, cardID) {
-      let typeInfo = await dispatch('getCardTypeInfo', cardID)
-      return typeInfo ? typeInfo.name : undefined
-    },
-    async getCardBindObjectInfo ({state, dispatch}, cardID) { // such as staff or vehicle
-      let cardTypeName = await dispatch('getCardTypeName', cardID)
+    getCardBindObjectInfo ({state, dispatch, commit}, cardID) { // such as staff or vehicle
+      commit('getCardInfo', cardID)
+      commit('getCardTypeID')
+      commit('getCardTypeInfo')
+      commit('getCardTypeName')
+      let cardTypeName = state.bindcard.typeInfoName
       let baseInfoTable = state.data[cardTypeName]
       if (!baseInfoTable && !state[cardTypeName]) {
         // this.pullDownMetadata(cardTypeName)
