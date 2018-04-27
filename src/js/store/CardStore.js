@@ -10,6 +10,7 @@ export default {
     nosignalscars: new Map(),
     uncovercards: new Map(),
     vstate: null,
+    sstate: null,
     overview: {},
     averageUpdateDuration: 1000,
     lastUpdateTime: 0
@@ -21,6 +22,19 @@ export default {
         state.averageUpdateDuration = inow - state.lastUpdateTime
       }
       state.lastUpdateTime = inow
+    },
+    processStat (state, data,type) {
+      let stat = null
+
+      if (data) {
+        if (this.state.user.deptID === 0) {
+          stat = data.glbl
+        } else if (data.dept) {
+          stat = data.dept[this.state.user.deptID]
+        }
+      }
+
+      data.type === 'vehicle'? state.vstate = stat : state.sstate = stat
     }
   },
   actions: {
@@ -34,33 +48,22 @@ export default {
       dispatch('processVehicleData', data.v)
       dispatch('processStaffData', data.s)
     },
-    async processVehicleData ({state, dispatch}, data) {
+    async processVehicleData ({state, dispatch,commit}, data) {
       if (!data) {
         return
       }
-      state.vstate = await dispatch('processStat', data.state)
+      data.stat.type = 'vehicle'
+      commit('processStat',data.stat)
       state.overview.vehicle = state.vstate ? state.vstate.sum : 0
       state.vcards = await dispatch('processDetail', data.detail)
     },
-    async processStaffData ({state, dispatch}, data) {
+    async processStaffData ({state, dispatch,commit}, data) {
       if (!data) return
-      state.sStat = await dispatch('processStat', data.stat)
-      state.overview.staff = state.sStat ? state.sStat.sum : 0
+      data.stat.type = 'staff'
+      commit('processStat',data.stat)
+      state.overview.staff = state.sstate ? state.sstate.sum : 0
 
       state.scards = await dispatch('processDetail', data.detail)
-    },
-    processStat ({state, dispatch}, data) {
-      let stat = null
-
-      if (data) {
-        if (this.state.user.deptID === 0) {
-          stat = data.glbl
-        } else if (data.dept) {
-          stat = data.dept[this.state.user.deptID]
-        }
-      }
-
-      return stat
     },
     async processDetail ({state, dispatch}, data) {
       let xmap = new Map()

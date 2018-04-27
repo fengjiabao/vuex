@@ -33,7 +33,7 @@ export default {
       dispatch('drawcard', data)
     },
     async drawcard ({state, dispatch}, data) {
-      console.log(data)
+      // console.log(data)
       let cmd = data.cmd
       let card = data.card
       let cardID = card[CARD.card_id]
