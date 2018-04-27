@@ -1,5 +1,6 @@
 import {toJson} from '../utils/utils.js'
 import {CARD} from '../def/state.js'
+import { getNomalCmd } from '../utils/cardStoreDep.js'
 const UNCOVER = 1000
 const SPECIAL = 1001
 export default {
@@ -108,28 +109,6 @@ export default {
       card && card.splice(1, 0, cardTypeID, cardBindedObjectID)
       return card
     },
-    getNomalCmd ({state}, data) {
-      let cmd = 'POSITION'
-      let areaTypeName = data.areaTypeName
-      let cardID = data.cardID
-      if (state.nosignalscars.has(cardID)) { // 该卡有信号时,如果之前为无信号状态,则删除该卡
-        state.nosignalscars.delete(cardID)
-      }
-      if (areaTypeName === UNCOVER) {
-        if (!state.uncovercards.has(cardID)) {
-          state.uncovercards.set(cardID, true)
-          cmd = 'UNCOVER' // 非覆盖区域,防止推实时数据时,非覆盖区域卡乱动
-        } else {
-          cmd = 'NOCHANGE'
-        }
-      } else {
-        if (areaTypeName === SPECIAL) {
-          cmd = 'SPECIAL' // 胶轮车存放硐室,无label
-        }
-        state.uncovercards.delete(cardID)
-      }
-      return cmd
-    },
     /**
      * 根据卡 推送过来的状态类型，获得对应的 cmd 指令
      * @param {*} 车:(非覆盖区域/运动/静止/停车场) 与 (丢失信号)
@@ -146,7 +125,8 @@ export default {
       let areaTypeID = area && Number(area.area_type_id)
       let areaTypeName = areaTypeID && areatype && areatype.get(areaTypeID).area_type_id
       areaTypeName = parseInt(areaTypeName, 10)
-      let cardTypeName = await this.dispatch('metaStore/getCardTypeName', cardID)
+      let cardTypeName = state.bindcard.typeInfoName
+      await this.dispatch('metaStore/getCardTypeName', cardID)
 
       let cardstate = card[CARD.state_biz] // 卡的业务状态 接收/没接收信号
       if (cardstate === 1024) { // 接收不到信号,车辆变灰
@@ -159,14 +139,14 @@ export default {
           if (areaTypeID < 1000) { // 正常区域时，会出现无信号状态
             cmd = 'NOSIGNAL'
           } else { // 非覆盖区域 or 胶轮车硐室 的情况
-            cmd = await dispatch('getNomalCmd', {
+            cmd = getNomalCmd(state,{
               areaTypeName: areaTypeName,
               cardID: cardID
             })
           }
         }
       } else {
-        cmd = await dispatch('getNomalCmd', {
+        cmd = getNomalCmd(state,{
           areaTypeName: areaTypeName,
           cardID: cardID
         })
