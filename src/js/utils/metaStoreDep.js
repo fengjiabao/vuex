@@ -41,4 +41,19 @@ function getCardBindObjectInfo (state, cardID) { // such as staff or vehicle
   return concatObject(objExtendInfo, objBaseInfo)
 }
 
-export {getCardBindObjectInfo, getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo}
+function getCurrentShiftID () {
+  let shiftID = -1
+
+  let time = new Date().format('hh:mm:ss')
+  if (time >= '23:00:00' || time < '07:00:00') {
+    shiftID = 1
+  } else if (time >= '07:00:00' && time < '15:00:00') {
+    shiftID = 2
+  } else {
+    shiftID = 3
+  }
+
+  return shiftID
+}
+
+export {getCardBindObjectInfo, getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo, getCurrentShiftID}

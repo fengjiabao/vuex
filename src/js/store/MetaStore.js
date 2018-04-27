@@ -1,6 +1,7 @@
 
 import {dealSpecialId, concatObject} from '../utils/utils.js'
-import {getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo} from '../utils/metaStoreDep.js'
+import {getCurrentShiftID} from '../utils/metaStoreDep.js'
+import {makePy} from '../utils/pyDep.js'
 export default {
   namespaced: true,
   state: {
@@ -23,7 +24,7 @@ export default {
       state.defs = res.data
     },
     updateDriverData ({state, commit, dispatch}, data) {
-      let shiftID = commit('getCurrentShiftID')
+      let shiftID = getCurrentShiftID()
 
       let recs = data.filter(item => item.shift_id === shiftID)
       if (recs && recs.length > 0) {
@@ -34,20 +35,6 @@ export default {
           state.driverData.set(recs[i].vehicle_number, rec)
         }
       }
-    },
-    getCurrentShiftID (state) {
-      let shiftID = -1
-
-      let time = new Date().format('hh:mm:ss')
-      if (time >= '23:00:00' || time < '07:00:00') {
-        shiftID = 1
-      } else if (time >= '07:00:00' && time < '15:00:00') {
-        shiftID = 2
-      } else {
-        shiftID = 3
-      }
-
-      return shiftID
     },
     storeAlarm (state, data) {
       let name = data.name
@@ -66,44 +53,29 @@ export default {
       if (filterCardRule && filterCardRule.status === 0) {
         state.needFilterCards = true
       }
-    }
-  },
-  actions: {
-    metaData ({state, dispatch, commit}, res) {
-      if (res && res.code === 0) {
-        let length = Object.keys(state.defs).length
-        if (res.data.name === 'mdt_update' && state.defs) {
-          if (!state.first && !state.data.mdt_update) {
-            let msg = {
-              information: '系统正在升级中，请勿关闭页面！'
-            }
-            state.first = !state.first
+    },
+    jointObj (state, type) {
+      let objects = state.dataInArray.get(type)
+      if (objects) {
+        for (let i = 0, len = objects.length; i < len; i++) {
+          let obj = objects[i]
+          let objID = obj[type + '_id']
+          let name = obj.name
+          // let spy = await this.dispatch('spell/makePy', name)
+          let spy = makePy(xdata.state.spell, name)
+          let brief = spy ? spy[0] : ''
+          obj.spy = brief
+          let objExtend = state.data[type + '_extend'].get(objID)
+          let objInfo = concatObject(obj, objExtend)
+          if (type === 'staff') {
+            state.staffs.set(objID, objInfo)
+          } else if (type === 'vehicle') {
+            state.vehicles.set(objID, objInfo)
           }
-          this.dispatch('dexieDBStore/dbOpen', res)
-        } else if (res.data.name === 'driver_arrange') {
-          let data = res.data.rows
-          if (data && data.length > 0) {
-            let time = new Date().format('yyyy-MM-dd')
-            let currentArrangement = data.filter(item => new Date(item.driver_date).format('yyyy-MM-dd') === time)
-            currentArrangement && currentArrangement.length > 0 && commit('updateDriverData', currentArrangement)
-          }
-        } else {
-          let name = res.data.name
-          if (name.indexOf('dat') < 0) {
-            name = `dat_${res.data.name}`
-          }
-          this.state.dexieDBStore.db[name] ? this.dispatch('dexieDBStore/storeDATA', {
-            name: name,
-            rows: res.data.rows,
-            upMethod: res.upMethod
-          }) : dispatch('saveMetaData', {
-            name: res.data.name,
-            rows: res.data.rows
-          })
         }
       }
     },
-    saveMetaData ({state, commit, dispatch}, msg) {
+    saveMetaData (state, msg) {
       let name = msg.name
       let rows = msg.rows
       state.dataInArray.set(name, rows) // TODO: meta saved two copys !!!
@@ -135,13 +107,49 @@ export default {
       }
       state.data[name] = tmp
       state.maxIDs[name] = maxID
+    }
+  },
+  actions: {
+    metaData ({state, dispatch, commit}, res) {
+      if (res && res.code === 0) {
+        let length = Object.keys(state.defs).length
+        if (res.data.name === 'mdt_update' && state.defs) {
+          if (!state.first && !state.data.mdt_update) {
+            let msg = {
+              information: '系统正在升级中，请勿关闭页面！'
+            }
+            state.first = !state.first
+          }
+          this.dispatch('dexieDBStore/dbOpen', res)
+        } else if (res.data.name === 'driver_arrange') {
+          let data = res.data.rows
+          if (data && data.length > 0) {
+            let time = new Date().format('yyyy-MM-dd')
+            let currentArrangement = data.filter(item => new Date(item.driver_date).format('yyyy-MM-dd') === time)
+            currentArrangement && currentArrangement.length > 0 && commit('updateDriverData', currentArrangement)
+          }
+        } else {
+          let name = res.data.name
+          if (name.indexOf('dat') < 0) {
+            name = `dat_${res.data.name}`
+          }
+          this.state.dexieDBStore.db[name] ? this.dispatch('dexieDBStore/storeDATA', {
+            name: name,
+            rows: res.data.rows,
+            upMethod: res.upMethod
+          }) : commit('saveMetaData', {
+            name: res.data.name,
+            rows: res.data.rows
+          })
+        }
+      }
     },
-    async saveData ({state, dispatch}, msg) {
+    async saveData ({state, commit, dispatch}, msg) {
       try {
         let table = this.state.dexieDBStore.db.table(msg.name) || this.state.dexieDBStore.db[msg.name]
         let rows = msg.value ? msg.value : await table.toArray()
         let keyname = msg.name.slice(4)
-        dispatch('saveMetaData', {
+        commit('saveMetaData', {
           name: keyname,
           rows: rows
         })
@@ -153,26 +161,6 @@ export default {
         // this.dealDataByDept()
       } catch (error) {
         console.warn(`table ${msg.name} does not exist!`)
-      }
-    },
-    async jointObj ({state, dispatch}, type) {
-      let objects = state.dataInArray.get(type)
-      if (objects) {
-        for (let i = 0, len = objects.length; i < len; i++) {
-          let obj = objects[i]
-          let objID = obj[type + '_id']
-          let name = obj.name
-          let spy = await this.dispatch('spell/makePy', name)
-          let brief = spy ? spy[0] : ''
-          obj.spy = brief
-          let objExtend = state.data[type + '_extend'].get(objID)
-          let objInfo = concatObject(obj, objExtend)
-          if (type === 'staff') {
-            state.staffs.set(objID, objInfo)
-          } else if (type === 'vehicle') {
-            state.vehicles.set(objID, objInfo)
-          }
-        }
       }
     },
     handleTable ({state, commit, dispatch}, msg) {
@@ -202,13 +190,13 @@ export default {
       }
       if (state.data['staff'] && state.data['staff_extend']) {
         if (!state.staffs.size || state.staffs.size !== state.data.staff.size) {
-          dispatch('jointObj', 'staff')
+          commit('jointObj', 'staff')
         }
       }
 
       if (state.data['vehicle'] && state.data['vehicle_extend']) {
         if (!state.vehicles.size || state.vehicles.size !== state.data.vehicle.size) {
-          dispatch('jointObj', 'vehicle')
+          commit('jointObj', 'vehicle')
         }
       }
     }
