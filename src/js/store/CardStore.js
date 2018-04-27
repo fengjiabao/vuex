@@ -2,8 +2,6 @@ import { toJson } from '../utils/utils.js'
 import { CARD } from '../def/state.js'
 import { processDetail } from '../utils/cardStoreDep.js'
 
-const UNCOVER = 1000
-const SPECIAL = 1001
 export default {
   namespaced: true,
   state: {
@@ -18,14 +16,14 @@ export default {
     lastUpdateTime: 0
   },
   mutations: {
-    updateRefreshDuration(state) {
+    updateRefreshDuration (state) {
       let inow = window.performance.now()
       if (state.lastUpdateTime > 0) {
         state.averageUpdateDuration = inow - state.lastUpdateTime
       }
       state.lastUpdateTime = inow
     },
-    processStat(state, data, type) {
+    processStat (state, data, type) {
       let stat = null
 
       if (data) {
@@ -40,34 +38,34 @@ export default {
     }
   },
   actions: {
-    cardUpdatePos({ state, dispatch, commit }, data) {
+    cardUpdatePos ({ state, dispatch, commit }, data) {
       dispatch('cardMove', data)
       commit('updateRefreshDuration')
     },
-    cardMove({ dispatch }, data) {
+    cardMove ({ dispatch }, data) {
       if (!data) return
       data = toJson(data)
       dispatch('processVehicleData', data.v)
       dispatch('processStaffData', data.s)
     },
-    processVehicleData({ state, dispatch, commit }, data) {
+    processVehicleData ({ state, dispatch, commit }, data) {
       if (!data) {
         return
       }
       data.stat.type = 'vehicle'
       commit('processStat', data.stat)
       state.overview.vehicle = state.vstate ? state.vstate.sum : 0
-      state.vcards = processDetail(state, data.detail)
+      state.vcards = processDetail(xdata, data.detail)
     },
-    processStaffData({ state, dispatch, commit }, data) {
+    processStaffData ({ state, dispatch, commit }, data) {
       if (!data) return
       data.stat.type = 'staff'
       commit('processStat', data.stat)
       state.overview.staff = state.sstate ? state.sstate.sum : 0
 
-      state.scards = processDetail(state, data.detail)
+      state.scards = processDetail(xdata, data.detail)
     },
-    showCard({ dispatch }, data) {
+    showCard ({ dispatch }, data) {
       let card = data.card
       let cmd = getCmdByState(xdata, data)
       // this.dispatch('olMapCardLayer/informMapUpdateCard', {
