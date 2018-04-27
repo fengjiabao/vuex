@@ -1,6 +1,6 @@
 
 import {dealSpecialId, concatObject} from '../utils/utils.js'
-import { unregisterDecorator } from 'handlebars';
+import {getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo} from '../utils/metaStoreDep.js'
 export default {
   namespaced: true,
   state: {
@@ -16,13 +16,7 @@ export default {
     vehicles: new Map(),
     first: false,
     CARD_TYPES: ['vehicle_extend', 'staff_extend', 'adhoc'],
-    defaultMapID: 5,
-    bindcard: {
-      cards: null,
-      cardTypeID: null,
-      typeInfo: null,
-      typeInfoName: undefined
-    }
+    defaultMapID: 5
   },
   mutations: {
     saveMetaDef (state, res) {
@@ -72,27 +66,6 @@ export default {
       if (filterCardRule && filterCardRule.status === 0) {
         state.needFilterCards = true
       }
-    },
-    getCardInfo (state, cardID) {
-      let cards = state.data['card']
-      state.bindcard.cards = cards ? cards.get(cardID) : null
-    },
-    getCardTypeID (state) {
-      state.bindcard.cardTypeID = state.bindcard.cards ? state.bindcard.cards.card_type_id : null
-    },
-    getCardTypeInfo (state) {
-      let ret = null
-      let cardTypeID = state.bindcard.cardTypeID
-      cardTypeID = parseInt(cardTypeID, 10)
-      if (cardTypeID >= 0) {
-        ret = state.data['card_type'] && state.data['card_type'].get(cardTypeID)
-      }
-
-      state.bindcard.typeInfo = ret
-    },
-    getCardTypeName (state) {
-      let typeInfo = state.bindcard.typeInfo
-      state.bindcard.typeInfoName = typeInfo ? typeInfo.name : undefined
     }
   },
   actions: {
@@ -238,33 +211,6 @@ export default {
           dispatch('jointObj', 'vehicle')
         }
       }
-    },
-    getCardBindObjectInfo ({state, dispatch, commit}, cardID) { // such as staff or vehicle
-      commit('getCardInfo', cardID)
-      commit('getCardTypeID')
-      commit('getCardTypeInfo')
-      commit('getCardTypeName')
-      let cardTypeName = state.bindcard.typeInfoName
-      let baseInfoTable = state.data[cardTypeName]
-      if (!baseInfoTable && !state[cardTypeName]) {
-        // this.pullDownMetadata(cardTypeName)
-        baseInfoTable = state.data[cardTypeName]
-      }
-
-      let objExtendInfo = state.cardIndex.get(cardID)
-      if (!objExtendInfo && !state[cardTypeName + '_extend']) {
-        // this.pullDownMetadata(cardTypeName + '_extend')
-        objExtendInfo = state.cardIndex.get(cardID)
-      }
-      let objID = objExtendInfo && objExtendInfo[cardTypeName + '_id']
-
-      let objBaseInfo = baseInfoTable && baseInfoTable.get(objID)
-
-      // 防止如果一张卡触发拉取元数据，但是并未拉取到，每张push来的定位数据卡重复多次拉取元数据
-      state[cardTypeName] = true
-      state[cardTypeName + '_extend'] = true
-
-      return concatObject(objExtendInfo, objBaseInfo)
     }
   }
 }
