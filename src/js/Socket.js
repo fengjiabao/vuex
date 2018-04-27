@@ -109,7 +109,7 @@ export default class Socket {
       }
       switch (cmd) {
         case 'pos_map':
-          // xdata.dispatch('cardStore/cardUpdatePos', data)
+          xdata.dispatch('cardStore/cardUpdatePos', data)
           break
       }
     })
