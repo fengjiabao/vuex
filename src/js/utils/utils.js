@@ -30,4 +30,11 @@ function concatObject (obj1, obj2) {
   return obj1
 }
 
-export {dealSpecialId, toJson, concatObject}
+function commitBindCardObj ({commit}, cardID) {
+  commit('getCardInfo', cardID)
+  commit('getCardTypeID')
+  commit('getCardTypeInfo')
+  commit('getCardTypeName')
+}
+
+export {dealSpecialId, toJson, concatObject, commitBindCardObj}
