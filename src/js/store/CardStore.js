@@ -1,6 +1,6 @@
 import { toJson } from '../utils/utils.js'
 import { CARD } from '../def/state.js'
-import { processDetail,addFields,getCmdByState} from '../utils/cardStoreDep.js'
+import {addFields, getCmdByState} from '../utils/cardStoreDep.js'
 
 export default {
   namespaced: true,
@@ -57,22 +57,22 @@ export default {
       state.overview.vehicle = state.vstate ? state.vstate.sum : 0
       state.vcards = dispatch('processDetail', data.detail)
     },
-    async processStaffData ({ state, dispatch, commit }, data) {
+    processStaffData ({ state, dispatch, commit }, data) {
       if (!data) return
       data.stat.type = 'staff'
       commit('processStat', data.stat)
       state.overview.staff = state.sstate ? state.sstate.sum : 0
 
-      state.scards = await dispatch('processDetail', data.detail)
+      state.scards = dispatch('processDetail', data.detail)
     },
-    async processDetail ({ state, dispatch }, data) {
+    processDetail ({ state, dispatch }, data) {
       let xmap = new Map()
       if (data) {
         for (let i = 0, len = data.length; i < len; i++) {
           let card = data[i]
           let cardID = card[CARD.card_id]
           card = addFields(this.state.metaStore, {cardID: cardID, card: card})
-    
+
           if (this.state.user.deptID === 0 || card[CARD.dept_id] === this.state.user.deptID) { // 全局 或 对应部门的详情
             xmap.set(cardID, card)
             dispatch('showCard', {
@@ -82,7 +82,7 @@ export default {
           }
         }
       }
-    
+
       return xmap
     },
     showCard ({ dispatch }, data) {
