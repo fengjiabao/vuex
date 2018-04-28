@@ -199,6 +199,9 @@ export default {
           commit('jointObj', 'vehicle')
         }
       }
+      if (name === 'area') {
+        this.dispatch('areaStore/initAreaList', state.data.area.values())
+      }
     }
   }
 }

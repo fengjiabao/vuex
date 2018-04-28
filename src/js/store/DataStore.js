@@ -9,6 +9,8 @@ import mapStore from './MapStore.js'
 import mapService from '../service/mapService.js'
 import cardStore from './CardStore.js'
 import alarmStore from './AlarmStore.js'
+import areaStore from './AreaStore.js'
+
 import olMapCardLayer from '../map/OlMapCardLayer.js'
 import olMapAnimator from '../map/OlMapAnimator.js'
 
@@ -24,6 +26,7 @@ export default new Vuex.Store({
     mapService: mapService,
     cardStore: cardStore,
     alarmStore: alarmStore,
+    areaStore: areaStore,
     olMapCardLayer: olMapCardLayer,
     olMapAnimator: olMapAnimator
   }
