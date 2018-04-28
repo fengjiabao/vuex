@@ -89,25 +89,4 @@ function addFields (state, data) {
   return card
 }
 
-function processDetail (xdata, data) {
-  let xmap = new Map()
-  if (data) {
-    for (let i = 0, len = data.length; i < len; i++) {
-      let card = data[i]
-      let cardID = card[CARD.card_id]
-      card = addFields(xdata.state.metaStore, {cardID: cardID, card: card})
-
-      if (xdata.state.user.deptID === 0 || card[CARD.dept_id] === xdata.state.user.deptID) { // 全局 或 对应部门的详情
-        xmap.set(cardID, card)
-        // dispatch('showCard', {
-        //   cardID: cardID,
-        //   card: card
-        // })
-      }
-    }
-  }
-
-  return xmap
-}
-
 export {getNomalCmd, getCmdByState, addFields, processDetail}
