@@ -42,11 +42,12 @@ export default {
         case 'DOWNMINE':
         case 'NOSIGNAL': // 丢失信号时如果有坐标变化，也做移动处理，若此时状态还是进入盲区则推送数据问题
           if (group) {
-            dispatch('cardAnimation', {
-              cardID: cardID,
-              group: group,
-              card: card
-            })
+            // dispatch('cardAnimation', {
+            //   cardID: cardID,
+            //   group: group,
+            //   card: card
+            // })
+            console.log(group)
           } else {
             group = drawCardOn(this.state, {
               card: card,
@@ -63,7 +64,7 @@ export default {
       let x = data.card[CARD.x]
       let y = -data.card[CARD.y]
       let duration = this.state.cardStore.averageUpdateDuration * 0.95
-      this.commit('olMapAnimator/animate', {
+      this.dispatch('olMapAnimator/animate', {
         msg: data.group,
         x: x,
         y: -y,
