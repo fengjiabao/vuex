@@ -39,9 +39,9 @@ function drawCardOn (state, data) {
     let cardID = card[CARD.card_id]
     let feature = null
     if (/^001/.test(cardID)) {
-      feature = state.staffLayerSource.getFeatureById(cardID)
+      feature = state.olMapCardLayer.staffLayerSource.getFeatureById(cardID)
     } else {
-      feature = state.vehicleLayerSource.getFeatureById(cardID)
+      feature = state.olMapCardLayer.vehicleLayerSource.getFeatureById(cardID)
     }
     return feature
   }
