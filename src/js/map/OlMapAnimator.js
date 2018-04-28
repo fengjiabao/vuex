@@ -1,10 +1,12 @@
 import TWEEN from '@tweenjs/tween.js'
+import {getStartPosition, stopAnimationLoop, moveto} from './mapUtils/animatorDep.js'
 export default {
   namespaced: true,
   state: {},
   actions: {
-    async animate ({state, dispatch}, data) {
+    animate ({state, dispatch}, data) {
       let obj = data.msg
+      let pObj = data.positionLay
       let x = data.x
       let y = -data.y
       let duration = data.duration
@@ -12,7 +14,7 @@ export default {
         console.log('Animate object is NULL')
         return
       }
-      let startPosition = await dispatch('getStartPosition', obj)
+      let startPosition = getStartPosition(obj, pObj)
       if (!startPosition) return
       if (x === startPosition[0] && y === startPosition[1]) {
         // Not change the position, NO need animation
@@ -21,14 +23,11 @@ export default {
       let targetPosition = [x, y]
       let tween = new TWEEN.Tween(startPosition).to(targetPosition, duration)
       tween.onUpdate(function () {
-        dispatch('moveto', {
-          obj: obj,
-          startPosition: startPosition
-        })
+        moveto(obj, pObj, startPosition)
       })
       tween.onComplete(function () {
         // 如果是调用 tween.stop() 中断动画, 则不会触发 tween.onCompplete()
-        dispatch('stopAnimationLoop', obj)
+        stopAnimationLoop(obj)
       })
       tween.start()
 
@@ -55,60 +54,6 @@ export default {
 
         TWEEN.update()
       }
-    },
-    async getStartPosition ({state, dispatch}, obj) {
-      let startPosition = await dispatch('stopPreviewAnimation', obj)
-      if (!startPosition) {
-        let geometry = obj.getGeometry()
-        startPosition = geometry && geometry.getCoordinates()
-      }
-
-      return startPosition
-    },
-    async stopPreviewAnimation ({dispatch}, obj) {
-      let ret = null
-      let isStopped = await dispatch('stopAnimationLoop', obj)
-      if (isStopped) {
-      // 注意：中断动画时，需要同时停掉 tween，否则会触发 tween.onComplete()
-        dispatch('stopTween', obj)
-
-        // 如果是主动中断的动画，需要把坐标移动到目标位置
-        ret = obj.get('xpos')
-        dispatch('moveto', {
-          obj: obj,
-          ret: ret
-        })
-      }
-
-      return ret
-    },
-    stopAnimationLoop ({dispatch}, obj) {
-      let ret = false
-      // let preRaf = obj && obj.get('rafId')
-      let preRaf = obj && obj.getProperties() && obj.getProperties()['rafId']
-      if (preRaf && parseInt(preRaf, 10) > 0) {
-      // 取消队列中的 animation frame，就不会执行 doAnimate()，相当于中断了 animation loop。
-        cancelAnimationFrame(preRaf)
-        // obj.set('rafId', null)
-        obj.getProperties()['rafId'] = null
-
-        ret = true
-      }
-
-      return ret
-    },
-    stopTween ({state}, obj) {
-      let tween = obj.get('xtween')
-      if (tween) {
-        tween.stop()
-        obj.set('xtween', null)
-      }
-    },
-    moveto ({state, dispatch}, data) {
-      let obj = data.obj
-      let pos = data.startPosition
-      let geometry = obj && obj.getGeometry()
-      geometry && geometry.setCoordinates(pos)
     }
   }
 }

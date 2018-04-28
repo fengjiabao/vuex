@@ -94,4 +94,17 @@ function createLabelStyle (feature, type, viewZoom, rotation, map) {
   })
 }
 
-export {drawSymbol}
+function convertSVGPath2Coord (pathString) {
+  let coordinates = []
+  let paths = pathString.split(' ')
+  for (let path of paths) {
+    let point = path.split(',')
+    let x = Number(point[0].substring(1))
+    let y = -Number(point[1])
+    coordinates.push([x, y])
+  }
+
+  return coordinates
+}
+
+export {drawSymbol, convertSVGPath2Coord}
