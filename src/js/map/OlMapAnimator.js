@@ -3,7 +3,7 @@ import {getStartPosition, stopAnimationLoop, moveto} from './mapUtils/animatorDe
 export default {
   namespaced: true,
   state: {},
-  mutations: {
+  actions: {
     animate ({state, dispatch}, data) {
       let obj = data.msg
       let pObj = data.positionLay
