@@ -57,15 +57,15 @@ export default {
       state.overview.vehicle = state.vstate ? state.vstate.sum : 0
       state.vcards = dispatch('processDetail', data.detail)
     },
-    async processStaffData ({ state, dispatch, commit }, data) {
+    processStaffData ({ state, dispatch, commit }, data) {
       if (!data) return
       data.stat.type = 'staff'
       commit('processStat', data.stat)
       state.overview.staff = state.sstate ? state.sstate.sum : 0
 
-      state.scards = await dispatch('processDetail', data.detail)
+      state.scards = dispatch('processDetail', data.detail)
     },
-    async processDetail ({ state, dispatch }, data) {
+    processDetail ({ state, dispatch }, data) {
       let xmap = new Map()
       if (data) {
         for (let i = 0, len = data.length; i < len; i++) {
