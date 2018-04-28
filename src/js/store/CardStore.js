@@ -1,6 +1,6 @@
 import { toJson } from '../utils/utils.js'
 import { CARD } from '../def/state.js'
-import { processDetail,addFields,getCmdByState} from '../utils/cardStoreDep.js'
+import {addFields, getCmdByState} from '../utils/cardStoreDep.js'
 
 export default {
   namespaced: true,
@@ -72,7 +72,7 @@ export default {
           let card = data[i]
           let cardID = card[CARD.card_id]
           card = addFields(this.state.metaStore, {cardID: cardID, card: card})
-    
+
           if (this.state.user.deptID === 0 || card[CARD.dept_id] === this.state.user.deptID) { // 全局 或 对应部门的详情
             xmap.set(cardID, card)
             dispatch('showCard', {
@@ -82,7 +82,7 @@ export default {
           }
         }
       }
-    
+
       return xmap
     },
     showCard ({ dispatch }, data) {
