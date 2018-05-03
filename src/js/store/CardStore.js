@@ -9,8 +9,8 @@ export default {
     scards: new Map(),
     nosignalscars: new Map(),
     uncovercards: new Map(),
-    vstate: null,
-    sstate: null,
+    vstate: {sum: 0},
+    sstate: {sum: 0},
     overview: {},
     averageUpdateDuration: 1000,
     lastUpdateTime: 0
