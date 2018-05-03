@@ -1,5 +1,5 @@
 <template>
-  <div> welcome to history page!</div>
+  <div class="whfill"> welcome to history page!</div>
 </template>
 <script>
 export default {
