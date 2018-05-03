@@ -6,7 +6,14 @@
           <grip></grip>
           <span>{{title}}</span>
         </span>
-        <svg class="icon"><use xlink:href="#icon-close"></use></svg>
+        <svg class="icon" @click="hide"><use xlink:href="#icon-close"></use></svg>
+      </div>
+      <div class="dlg-body">
+        <!-- <search-bar :cardType="cardType"></search-bar> -->
+        <table v-if="hasdata">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -15,18 +22,26 @@
 <script>
 import {mapState} from 'vuex'
 import grip from './grip'
+import searchBar from './search-bar'
 export default {
   data () {
     return {
       isShow: false,
-      icons: '#icon-close'
+      cardType: 1,
+      hasdata: false
     }
   },
   watch: {
     '$store.state.stateStore.showDetailDialog': {
-      handler: function (result) {
-        return this.isShow = result
+      handler: function (result) { // 箭头函数无法获取this指向实例
+        this.isShow = result
       }
+    },
+    '$store.state.stateStore.detailDialogMsg.subTypeID': {
+      handler: function (result) {
+        this.cardType = result
+      },
+      deep: true // 深度监听，监听二级
     }
   },
   computed: {
@@ -40,8 +55,14 @@ export default {
       }
     })
   },
+  methods: {
+    hide () {
+      this.$store.commit('stateStore/changeShowDetailDialog')
+    }
+  },
   components: {
-    grip
+    grip,
+    searchBar
   }
 }
 </script>

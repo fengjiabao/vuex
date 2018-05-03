@@ -34,8 +34,8 @@ export default {
   },
   computed: {
     ...mapState({
-      vehicleCount: state => state.cardStore.vstate ? state.cardStore.vstate.sum : 0,
-      staffCount: state => state.cardStore.sstate ? state.cardStore.sstate.sum : 0
+      vehicleCount: state => state.cardStore.vstate.sum ? state.cardStore.vstate.sum : 0,
+      staffCount: state => state.cardStore.sstate.sum ? state.cardStore.sstate.sum : 0
     })
   },
   methods: {
@@ -74,7 +74,9 @@ export default {
     .label-icon
       @include wh(3rem, 3rem)
       position: absolute
-      left: 0
+      left: .5rem
+      top: .5rem
+      fill: $label-icon-color
     .current-count
       position: absolute
       font-size: $fontsize-xxl

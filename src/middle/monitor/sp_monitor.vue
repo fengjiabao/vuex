@@ -66,4 +66,6 @@ export default {
     .mapaside
       position: absolute
       z-index: 10
+      height: 100%
+      display: flex
 </style>

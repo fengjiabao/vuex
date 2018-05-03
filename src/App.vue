@@ -51,6 +51,16 @@ li
   justify-content: center
   align-items: center
 
+.dlg-bg
+  @include flex-cloumn
+
+.dlg-head
+  background: $main-color
+  padding: 0 1rem 0 .5rem
+  flex: 0 0 2.6rem
+  color: $font-eee
+  @include flex-column-center
+
 .dlg-content 
   display: flex
   flex-direction: column
