@@ -1,3 +1,3 @@
 <template>
-  <div>welcome to manage page!</div>
+  <div class="whfill">welcome to manage page!</div>
 </template>

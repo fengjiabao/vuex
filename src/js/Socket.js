@@ -4,7 +4,7 @@ import {toJson} from './utils/utils.js'
 
 // const url = '127.0.0.1:9000'
 const url = 'localhost:8086'
-// const url = '60.220.238.150:8086'
+// const url = '60.220.238.150:9000'
 const connectionOpts = {
   // "force new connection": true,
   'reconnectionAttempts': 'Infinity', // avoid having user reconnect manually in order to prevent dead clients after a server restart
@@ -49,6 +49,8 @@ export default class Socket {
       self.socket.on('connect', () => {
         clearTimeout(timer)
         resolve(self.socket)
+        let ctime = (new Date()).format('hh:mm:ss')
+        xdata.commit('collectorStore/changeNetWorkStatus', {connect: true, time: ctime})
       })
 
       // errors
@@ -57,6 +59,9 @@ export default class Socket {
       self.socket.on('error', error)
       self.socket.on('disconnect', (error) => {
         console.log(error)
+        xdata.commit('collectorStore/changeStatus', false)
+        let ctime = (new Date()).format('hh:mm:ss')
+        xdata.commit('collectorStore/changeNetWorkStatus', {connect: false, time: ctime})
       })
 
       // here reconnect to remote
@@ -110,6 +115,12 @@ export default class Socket {
       switch (cmd) {
         case 'pos_map':
           xdata.dispatch('cardStore/cardUpdatePos', data)
+          xdata.commit('collectorStore/changeStatus', true)
+          xdata.commit('collectorStore/updateLastPushTime')
+          break
+        case 'collector_status':
+          xdata.commit('collectorStore/receiveStatus', data)
+          xdata.commit('collectorStore/updateLastPushTime')
           break
       }
     })

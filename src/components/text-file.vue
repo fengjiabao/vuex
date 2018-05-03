@@ -34,6 +34,10 @@ export default {
       fill: $white
       margin-right: 1rem
     input
-      height: 1.5rem
+      height: 1.9rem
+      &:-webkit-autofill
+        -webkit-box-shadow: 0 0 0px 1000px #ccc inset !important
+        border: none
+        padding-left: .5rem
 </style>
 
