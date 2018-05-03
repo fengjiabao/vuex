@@ -1,10 +1,16 @@
 <template>
   <div class="page-body">
     <div id="monitormap"></div>
+    <div class="mapaside">
+      <over-view></over-view>
+      <map-sidebar></map-sidebar>
+    </div>
   </div>
 </template>
 <script>
 import {mapState} from 'vuex'
+import overView from './over-view'
+import mapSidebar from './map-sidebar'
 export default {
   computed: {
     ...mapState ({
@@ -39,6 +45,10 @@ export default {
         dom: dom
       })
     }
+  },
+  components: {
+    overView,
+    mapSidebar
   }
 }
 </script>
@@ -53,4 +63,7 @@ export default {
       @include wh(100%, 100%)
       background: url(../../assets/mapBg.png) center center
       background-size: cover
+    .mapaside
+      position: absolute
+      z-index: 10
 </style>
