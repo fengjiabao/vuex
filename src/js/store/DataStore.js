@@ -11,6 +11,7 @@ import cardStore from './CardStore.js'
 import alarmStore from './AlarmStore.js'
 import areaStore from './AreaStore.js'
 import stateStore from './StateStore.js'
+import collectorStore from './CAndNetStatusStore.js'
 
 import olMapCardLayer from '../map/OlMapCardLayer.js'
 import olMapAnimator from '../map/OlMapAnimator.js'
@@ -18,18 +19,19 @@ import olMapAnimator from '../map/OlMapAnimator.js'
 Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
-    spell: spell,
-    user: user,
-    metaStore: metaStore,
-    socketStore: socketStore,
-    dexieDBStore: dexieDBStore,
-    mapStore: mapStore,
-    mapService: mapService,
-    cardStore: cardStore,
-    alarmStore: alarmStore,
-    areaStore: areaStore,
-    stateStore: stateStore,
-    olMapCardLayer: olMapCardLayer,
-    olMapAnimator: olMapAnimator
+    spell,
+    user,
+    metaStore,
+    socketStore,
+    dexieDBStore,
+    mapStore,
+    mapService,
+    cardStore,
+    alarmStore,
+    areaStore,
+    stateStore,
+    olMapCardLayer,
+    olMapAnimator,
+    collectorStore
   }
 })
