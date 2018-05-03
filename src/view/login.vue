@@ -118,6 +118,8 @@ export default {
         background: $main-color
         border: 0
         color: $white
+        cursor: pointer
+        margin-top: .5rem
   .comp 
     @include flex-align-item
     flex: 0 0 3rem
