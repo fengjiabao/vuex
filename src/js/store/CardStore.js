@@ -85,10 +85,10 @@ export default {
 
       return xmap
     },
-    showCard ({ dispatch }, data) {
+    async showCard ({ dispatch }, data) {
       let card = data.card
       let cmd = getCmdByState(xdata, data)
-      this.dispatch('olMapCardLayer/informMapUpdateCard', {
+      await this.dispatch('olMapCardLayer/informMapUpdateCard', {
         cmd: cmd,
         card: card
       })

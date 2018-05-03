@@ -19,6 +19,7 @@ $gray-s: #efefef
 $gray-m: #e7e7e7
 $gray-l: #f5f5f5
 $alarm-color: #f80
+$grip-color: #ccc
 
 // background
 $login-background: rgba(0, 0, 0, 0.4)
@@ -65,4 +66,9 @@ $login-shadow: 0px 0px 50px 0px rgba(255, 255, 255, 0.2)
 
 @mixin flex-space-between
   display: flex
+  justify-content: space-between
+
+@mixin align-middle-between
+  display: flex
+  align-items: center
   justify-content: space-between
