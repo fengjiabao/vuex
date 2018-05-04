@@ -1,6 +1,7 @@
 import {drawSymbol} from '../../utils/OlMapUtils.js'
 import {CARD} from '../../def/state.js'
 import { getCardBindObjectInfo } from '../../utils/metaStoreDep.js'
+import {animate} from './animatorDep.js'
 
 function drawCardOn (state, data) {
   let card = data.card
@@ -68,4 +69,73 @@ function setCardCoord (cardID, group, card) {
   // xdata.trackStore.tracks.delete(cardID)
 }
 
-export {drawCardOn, getFeature, setCardCoord}
+// 测试
+function informMapUpdateCard (data) {
+  if (!data) return
+  // dispatch('drawcard', data)
+  let cmd = data.cmd
+  let card = data.card
+  let xdata = data.xdata
+  let cardID = card[CARD.card_id]
+  let group = getFeature(xdata.state, card)
+  let type = cmd === 'NOSIGNAL' ? 'nosignal' : null
+  if (group) {
+    // dispatch('cardAnimation', {
+    //   cardID: cardID,
+    //   group: group,
+    //   card: card
+    // })
+    let duration = xdata.state.cardStore.averageUpdateDuration * 0.95
+    animate({
+      msg: group,
+      x: card[CARD.x],
+      y: card[CARD.y],
+      duration: duration
+    })
+    setCardCoord(cardID, group, card)
+  } else {
+    group = drawCardOn(xdata.state, {
+      card: card,
+      className: 'card-add',
+      type: type
+    })
+    xdata.commit('olMapCardLayer/setGroups', {
+      cardID: cardID,
+      group: group
+    })
+  }
+  // switch (cmd) {
+  //   case 'POSITION':
+  //   case 'DOWNMINE':
+  //   case 'NOSIGNAL': // 丢失信号时如果有坐标变化，也做移动处理，若此时状态还是进入盲区则推送数据问题
+  //     if (group) {
+  //       // dispatch('cardAnimation', {
+  //       //   cardID: cardID,
+  //       //   group: group,
+  //       //   card: card
+  //       // })
+  //       let duration = xdata.state.cardStore.averageUpdateDuration * 0.95
+  //       animate({
+  //         msg: group,
+  //         x: card[CARD.x],
+  //         y: card[CARD.y],
+  //         duration: duration
+  //       })
+  //       setCardCoord(cardID, group, card)
+  //     } else {
+  //       group = drawCardOn(xdata.state, {
+  //         card: card,
+  //         className: 'card-add',
+  //         type: type
+  //       })
+  //       xdata.commit('olMapCardLayer/setGroups', {
+  //         cardID: cardID,
+  //         group: group
+  //       })
+  //     }
+  //     break
+  //       // case
+  // }
+}
+
+export {drawCardOn, getFeature, setCardCoord, informMapUpdateCard}

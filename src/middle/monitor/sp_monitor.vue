@@ -19,7 +19,6 @@ export default {
   },
   watch: {
     loadMap: function () {
-      console.log('2222')
       let id = xdata.state.mapStore.defaultMapID
       let map = xdata.state.mapStore.map
       let mapRow = xdata.state.mapStore.row

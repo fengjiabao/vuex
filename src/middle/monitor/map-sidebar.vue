@@ -10,7 +10,7 @@
     </div>
     <div class="topic-main" ref="topic-main" name="topic-main">
       <div class="topic-title" ref="topictitle">{{ activeTopic ? activeTopic.label : '' }}</div>
-      <topic-panel></topic-panel>
+      <router-view/>
     </div>
   </div>
 </template>
@@ -75,6 +75,9 @@ export default {
         flex: 0 0 2.4rem
         background: $gray-l
         font-weight: 1000
+      .topic-panel
+        flex: auto
+        background: $white
   .map-sidebar-full
     flex: 0 0 22rem
   .map-sidebar-narrow
