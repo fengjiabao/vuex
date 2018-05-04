@@ -86,34 +86,6 @@ export default {
 
       // state.scards = dispatch('processDetail', data.detail)
       state.scards = processDetail(xdata, data.detail)
-    },
-    processDetail ({ state, dispatch }, data) {
-      let xmap = new Map()
-      if (data) {
-        for (let i = 0, len = data.length; i < len; i++) {
-          let card = data[i]
-          let cardID = card[CARD.card_id]
-          card = addFields(this.state.metaStore, {cardID: cardID, card: card})
-
-          if (this.state.user.deptID === 0 || card[CARD.dept_id] === this.state.user.deptID) { // 全局 或 对应部门的详情
-            xmap.set(cardID, card)
-            dispatch('showCard', {
-              cardID: cardID,
-              card: card
-            })
-          }
-        }
-      }
-
-      return xmap
-    },
-    async showCard ({ dispatch }, data) {
-      let card = data.card
-      let cmd = getCmdByState(xdata, data)
-      await this.dispatch('olMapCardLayer/informMapUpdateCard', {
-        cmd: cmd,
-        card: card
-      })
     }
   }
 }
