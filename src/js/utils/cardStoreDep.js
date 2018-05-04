@@ -1,5 +1,7 @@
 import {CARD} from '../def/state.js'
-import {getCardBindObjectInfo, getCardTypeInfo, getCardTypeName} from './metaStoreDep.js'
+import {getCardBindObjectInfo, getCardTypeInfo, getCardTypeName, getNameByID} from './metaStoreDep.js'
+import {ST, OD} from '../def/odef.js'
+import {informMapUpdateCard} from '../map/mapUtils/cardLayerDep.js'
 
 const UNCOVER = 1000
 const SPECIAL = 1001
@@ -89,4 +91,118 @@ function addFields (state, data) {
   return card
 }
 
-export {getNomalCmd, getCmdByState, addFields, processDetail}
+// 根据统计的 ID，补全名称
+function addName (data, statType, xdata) {
+  if (data && data.length > 0) {
+    let idName = statType + '_id'
+    for (let i = 0, len = data.length; i < len; i++) {
+      let row = data[i]
+      let name = getNameByID(idName, row[0], xdata)
+
+      row.push(name)
+      if (statType === 'area') {
+        let areatype = xdata.state.metaStore.data.area && xdata.state.metaStore.data.area.get(row[0]) && xdata.state.metaStore.data.area.get(row[0]).area_type_id
+        row.push(areatype)
+      }
+    }
+  }
+
+  return data
+}
+
+/**
+  * 获取（vehicle, staff）按照（area, dept, level）分类的某个类别（id）的明细
+   * @param {*} cardType 卡类别，（vehicle, staff）
+   * @param {*} groupBy 分类（area, dept, level）
+   * @param {*} groupID 分类 ID（id）
+   */
+function getDetail (xdata, cardType, groupBy, groupID, filterGeo) {
+  let fieldIndex = 0
+  switch (groupBy) {
+    case ST.AREA:
+      fieldIndex = CARD.area_id
+      break
+    case ST.DEPT:
+      fieldIndex = CARD.dept_id
+      break
+    case ST.LEVEL:
+      fieldIndex = CARD.occupation_level_id
+      break
+    case ST.SUM:
+      fieldIndex = -1 // ALL
+      break
+    default:
+      // console.log('UNKNOWN groupBy: ', groupBy)
+      return
+  }
+
+  let xmap = getStatesMapByCardType(cardType, xdata)
+  let allCards = xmap && Array.from(xmap.values())
+  let arrtriFilterCards = fieldIndex < 0 ? allCards : allCards.filter(item => item[fieldIndex] === groupID)
+  if (filterGeo) {
+    // 空间条件过滤
+    arrtriFilterCards = arrtriFilterCards.filter(function (item) {
+      let coord = [item[3], -item[4]]
+      let isItem = filterGeo.intersectsCoordinate(coord)
+      return isItem
+    })
+  }
+  return arrtriFilterCards
+}
+
+/**
+   * 根据卡类型（vehicle, staff）获得对应的 map
+   * @param {*} type
+   */
+function getStatesMapByCardType (type, xdata) {
+  let xmap = null
+  switch (type) {
+    case OD.VEHICLE:
+      xmap = xdata.state.cardStore.vcards
+      break
+    case OD.STAFF:
+      xmap = xdata.state.cardStore.scards
+      break
+    default:
+      console.log('UNKNOWN type:', type)
+      return null
+  }
+
+  return xmap
+}
+
+// 测试
+function processDetail (xdata, data) {
+  let xmap = new Map()
+  if (data) {
+    for (let i = 0, len = data.length; i < len; i++) {
+      let card = data[i]
+      let cardID = card[CARD.card_id]
+      card = addFields(xdata.state.metaStore, {cardID: cardID, card: card})
+
+      if (xdata.state.user.deptID === 0 || card[CARD.dept_id] === xdata.state.user.deptID) { // 全局 或 对应部门的详情
+        xmap.set(cardID, card)
+        showCard(cardID, card, xdata)
+        // dispatch('showCard', {
+        //   cardID: cardID,
+        //   card: card
+        // })
+      }
+    }
+  }
+
+  return xmap
+}
+
+function showCard (cardID, card, xdata) {
+  let cmd = getCmdByState(xdata, {
+    cardID: cardID,
+    card: card
+  })
+  informMapUpdateCard({
+    cmd: cmd,
+    card: card,
+    xdata: xdata
+  })
+}
+export {getNomalCmd, getCmdByState, addFields, processDetail, addName, getDetail}
