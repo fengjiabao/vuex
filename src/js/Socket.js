@@ -3,8 +3,8 @@ import { EVT, CMD } from './Protocol.js'
 import {toJson} from './utils/utils.js'
 
 // const url = '127.0.0.1:9000'
-// const url = 'localhost:8086'
-const url = '60.220.238.150:9000'
+const url = 'localhost:8086'
+// const url = '60.220.238.150:9000'
 const connectionOpts = {
   // "force new connection": true,
   'reconnectionAttempts': 'Infinity', // avoid having user reconnect manually in order to prevent dead clients after a server restart
