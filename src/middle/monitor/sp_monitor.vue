@@ -15,7 +15,7 @@ import mapSidebar from './map-sidebar'
 import toolPanel from './tool-panel'
 export default {
   computed: {
-    ...mapState ({
+    ...mapState({
       loadMap: state => state.mapStore.loadMap
     })
   },

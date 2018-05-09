@@ -51,14 +51,14 @@ export default {
             //   group: group,
             //   card: card
             // })
-            // let duration = this.state.cardStore.averageUpdateDuration * 0.95
-            // animate({
-            //   msg: group,
-            //   x: card[CARD.x],
-            //   y: card[CARD.y],
-            //   duration: duration
-            // })
-            setCardCoord(cardID, group, card)
+            let duration = this.state.cardStore.averageUpdateDuration * 0.95
+            animate({
+              msg: group,
+              x: card[CARD.x],
+              y: card[CARD.y],
+              duration: duration
+            })
+            // setCardCoord(cardID, group, card)
           } else {
             group = drawCardOn(this.state, {
               card: card,
