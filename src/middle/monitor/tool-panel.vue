@@ -7,7 +7,7 @@
             </svg>
           </li>
       </ul>
-      <ul class="toolList" v-if="showPanelList" :style="leftPosition">
+      <ul class="toolList" ref='toolList' v-if="showPanelList" :style="leftPosition">
         <li class="triangle"></li>
         <li v-for="(item,index) in toolListData" :key="index">
             <svg class = "icon">
@@ -20,26 +20,30 @@
 </template>
 <script>
 import {ToolItems} from '../../js/def/tool_panel_def.js'
-import { ToolList } from "../../js/def/tool_list_def.js";
+import { ToolList } from '../../js/def/tool_list_def.js'
 export default {
-    data(){
-        return{
-            ToolItems: ToolItems,
-            ToolListdef: ToolList,
-            showPanelList: false,
-            toolListData : null,
-            containsListName: ['layer','search','measure'],
-            leftPosition: 'left: 0px'
-        }
-    },
-    methods: {
-        showToolList: function(evt){
-            let name = evt.currentTarget.getAttribute('name')
-            this.showPanelList = this.containsListName.includes(name) ? true : false
-            this.toolListData = this.ToolListdef[name]
-            this.leftPosition = 'left: ' + String(evt.clientX - this.$el.getBoundingClientRect().left - this.$el.querySelector('.toolList').getBoundingClientRect().width * 0.71 ) + 'px'
-        }
+  data () {
+    return {
+      ToolItems: ToolItems,
+      ToolListdef: ToolList,
+      showPanelList: false,
+      toolListData: null,
+      containsListName: ['layer', 'search', 'measure'],
+      leftPosition: 'left: 0px'
     }
+  },
+  methods: {
+    showToolList: function (evt) {
+      let name = evt.currentTarget.getAttribute('name')
+      this.showPanelList = !!this.containsListName.includes(name)
+      if (this.showPanelList) {
+        this.toolListData = this.ToolListdef[name]
+        console.log('this.refs', this.$refs)
+        // console.log('$refs', $refs)
+        this.leftPosition = 'left: ' + String(evt.clientX - this.$el.getBoundingClientRect().left - 100) + 'px'
+      }
+    }
+  }
 }
 </script>
 <style lang="sass" scoped>
@@ -58,7 +62,7 @@ export default {
             @include align-middle-between
             justify-content: space-around
     .toolList
-        @include wh(6rem,auto)
+        @include wh(auto,auto)
         display: flex
         flex-direction: column
         height: auto
