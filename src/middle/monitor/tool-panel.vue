@@ -32,14 +32,19 @@ export default {
       leftPosition: 'left: 0px'
     }
   },
+  watch: {
+    '$store.state.olMapCardLayer.hideAllPopup': {
+      handler: function (result) {
+        this.showPanelList = false
+      }
+    }
+  },
   methods: {
     showToolList: function (evt) {
       let name = evt.currentTarget.getAttribute('name')
       this.showPanelList = !!this.containsListName.includes(name)
       if (this.showPanelList) {
         this.toolListData = this.ToolListdef[name]
-        console.log('this.refs', this.$refs)
-        // console.log('$refs', $refs)
         this.leftPosition = 'left: ' + String(evt.clientX - this.$el.getBoundingClientRect().left - 100) + 'px'
       }
     }

@@ -11,8 +11,8 @@ import headView from '@/header/head'
 import footView from '@/foot/foot'
 export default {
   components: {
-     headView,
-     footView 
+    headView,
+    footView
   }
 }
 </script>
