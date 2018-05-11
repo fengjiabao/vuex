@@ -190,4 +190,27 @@ function getVehicleDriver (vehicleNumber, xdata) {
   return xdata.state.metaStore.driverData && xdata.state.metaStore.driverData.get(vehicleNumber)
 }
 
-export {getCardBindObjectInfo, getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo, getCurrentShiftID, getNameByID, formatStateArray, getVehicleDriver}
+function formatRecordArray (def, row, rule) { // rule: SHORT-DATE or not, etc.
+  if (!def || !row) {
+    return row
+  }
+
+  let ret = []
+  for (let i = 0; i < def.fields.names.length; i++) {
+    let name = def.fields.names[i]
+
+    if (i === def.keyIndex) { // key 不做转换
+      ret.push(row[name])
+      continue
+    }
+
+    let type = def.fields.types[i]
+    let value = row[name]
+    value = this.formatField(name, value, type, rule)
+
+    ret.push(value)
+  }
+  return ret
+}
+
+export {getCardBindObjectInfo, getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo, getCurrentShiftID, getNameByID, formatStateArray, getVehicleDriver, formatRecordArray}
