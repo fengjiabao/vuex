@@ -26,6 +26,8 @@
             </tr>
           </tbody>
         </table>
+        <pagination :totalpage="pageCount" :pageindex="pageIndex" :tablename="name"></pagination>
+        <div v-if="!hasdata" class="tips">无相关数据！</div>
       </div>
     </div>
   </div>
@@ -34,6 +36,7 @@
 <script>
 import { mapState } from 'vuex'
 import grip from './grip'
+import pagination from './pagination'
 import { getDetail } from '../js/utils/cardStoreDep.js'
 import searchBar from './search-bar'
 import cardStateDef from '../js/def/card_state_def.js'
@@ -50,7 +53,8 @@ export default {
       subTypeName: null,
       labels: null,
       names: null,
-      subRows: null
+      subRows: null,
+      PAGE_SIZE: 10
     }
   },
   watch: {
@@ -109,8 +113,7 @@ export default {
       this.showDetail()
     },
     showDetail () {
-      const PAGE_SIZE = 10
-      this.subRows = this.rows.slice(0, PAGE_SIZE)
+      this.subRows = this.rows.slice(0, this.PAGE_SIZE)
       let count = this.subRows.length
       for (let i = 0; i < count; i++) {
         let row = this.subRows[i]
@@ -119,7 +122,12 @@ export default {
         // this.subRows[i].push(this.isSpecialArea(areaID))
       }
       console.log('this.subRow', this.subRows)
-      // this.initPagination() // todo
+      this.initPagination() // todo
+    },
+    initPagination () {
+      this.rowCount = this.rows ? this.rows.length : 0
+      this.pageCount = Math.ceil(this.rowCount / this.PAGE_SIZE)
+      this.pageIndex = 0
     },
     getCardRows (subTypeID, statType, composeType, areaID, deptID, filterGeo) {
       let ret = null
@@ -133,7 +141,8 @@ export default {
   },
   components: {
     grip,
-    searchBar
+    searchBar,
+    pagination
   }
 }
 </script>
@@ -147,14 +156,18 @@ export default {
     display: flex
 .detail-content
   background: #eee
+  .tips
+    @include wh(100%,3rem)
+    text-align: center
+    line-height: 3rem
   table
     width: 100%
     font-size: 14px
     th
-      padding: .5rem 0
+      padding: .3rem 0
     tr
-      height: 1rem
+      height: .8rem
       td
-        padding: .5rem 0
+        padding: .3rem 0
         text-align: center
 </style>
