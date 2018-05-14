@@ -5,15 +5,17 @@
       <over-view></over-view>
       <map-sidebar></map-sidebar>
     </div>
+    <tool-panel></tool-panel>
   </div>
 </template>
 <script>
 import {mapState} from 'vuex'
 import overView from './over-view'
 import mapSidebar from './map-sidebar'
+import toolPanel from './tool-panel'
 export default {
   computed: {
-    ...mapState ({
+    ...mapState({
       loadMap: state => state.mapStore.loadMap
     })
   },
@@ -47,7 +49,8 @@ export default {
   },
   components: {
     overView,
-    mapSidebar
+    mapSidebar,
+    toolPanel
   }
 }
 </script>
