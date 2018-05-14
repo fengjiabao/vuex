@@ -27,7 +27,7 @@ export default {
           this.pullMetadata()
           break
         case 'showPwdDialog':
-          // this.showPwdDialog()
+          this.showPwdDialog()
           break
         case 'logout':
           // this.logout()
@@ -35,9 +35,10 @@ export default {
       }
     },
     pullMetadata () {
-      xbus.$emit('showTips', {
-        name: 'metadata'
-      })
+      this.$store.commit('stateStore/changeShowIconTips', 'metadata')
+    },
+    showPwdDialog () {
+      this.$store.commit('stateStore/changePwd')
     }
   }
 }
@@ -49,7 +50,7 @@ export default {
     @include flex-cloumn
     top: 2rem
     right: 0
-    width: 6rem
+    @include wh(6rem, 8rem)
     background: $gray-l
     z-index: 99
     li

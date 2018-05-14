@@ -74,39 +74,6 @@ export default {
           }
         }
       }
-    },
-    saveMetaData (state, msg) {
-      let name = msg.name
-      let rows = msg.rows
-      state.dataInArray.set(name, rows) // TODO: meta saved two copys !!!
-
-      let tmp = new Map() // temp map to save the rows
-      let cardList = state.CARD_TYPES.includes(name) ? new Map() : null
-      let maxID = 0
-      if (rows) {
-        let def = state.defs && state.defs[name]
-        let keyName = def ? def.fields.names[def.keyIndex] : name + '_id'
-        keyName = dealSpecialId(name, keyName)
-        for (let item of rows) {
-        // save to data
-          let keyValue = item[keyName]
-          tmp.set(keyValue, item)
-
-          // is card, save to cardIndex
-          if (cardList) {
-            let cardID = item['card_id']
-            cardList.set(cardID, item)
-            state.cardIndex.set(cardID, item)
-          }
-
-          // init the maxID
-          if (keyValue > maxID) {
-            maxID = keyValue
-          }
-        }
-      }
-      state.data[name] = tmp
-      state.maxIDs[name] = maxID
     }
   },
   actions: {
@@ -137,7 +104,7 @@ export default {
             name: name,
             rows: res.data.rows,
             upMethod: res.upMethod
-          }) : commit('saveMetaData', {
+          }) : dispatch('saveMetaData', {
             name: res.data.name,
             rows: res.data.rows
           })
@@ -149,7 +116,7 @@ export default {
         let table = this.state.dexieDBStore.db.table(msg.name) || this.state.dexieDBStore.db[msg.name]
         let rows = msg.value ? msg.value : await table.toArray()
         let keyname = msg.name.slice(4)
-        commit('saveMetaData', {
+        dispatch('saveMetaData', {
           name: keyname,
           rows: rows
         })
@@ -201,6 +168,43 @@ export default {
       }
       if (name === 'area') {
         this.dispatch('areaStore/initAreaList', state.data.area.values())
+      }
+    },
+    saveMetaData ({state}, msg) {
+      let name = msg.name
+      let rows = msg.rows
+      state.dataInArray.set(name, rows) // TODO: meta saved two copys !!!
+
+      let tmp = new Map() // temp map to save the rows
+      let cardList = state.CARD_TYPES.includes(name) ? new Map() : null
+      let maxID = 0
+      if (rows) {
+        let def = state.defs && state.defs[name]
+        let keyName = def ? def.fields.names[def.keyIndex] : name + '_id'
+        keyName = dealSpecialId(name, keyName)
+        for (let item of rows) {
+        // save to data
+          let keyValue = item[keyName]
+          tmp.set(keyValue, item)
+
+          // is card, save to cardIndex
+          if (cardList) {
+            let cardID = item['card_id']
+            cardList.set(cardID, item)
+            state.cardIndex.set(cardID, item)
+          }
+
+          // init the maxID
+          if (keyValue > maxID) {
+            maxID = keyValue
+          }
+        }
+      }
+      state.data[name] = tmp
+      state.maxIDs[name] = maxID
+
+      if (cardList) {
+        window.xdata.commit('cardStore/cardInfoUpdate', { type: name, data: cardList })
       }
     }
   }

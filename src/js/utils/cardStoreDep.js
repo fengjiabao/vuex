@@ -2,6 +2,7 @@ import {CARD} from '../def/state.js'
 import {getCardBindObjectInfo, getCardTypeInfo, getCardTypeName, getNameByID} from './metaStoreDep.js'
 import {ST, OD} from '../def/odef.js'
 import {informMapUpdateCard} from '../map/mapUtils/cardLayerDep.js'
+// import {}
 
 const UNCOVER = 1000
 const SPECIAL = 1001
@@ -84,6 +85,11 @@ function addFields (state, data) {
       cardBindedObjectID = bindedObject.name
     }
   } else {
+    if (/^001/g.test(cardID)) {
+      cardTypeID = 1
+    } else {
+      cardTypeID = 2
+    }
     console.warn(`Can NOT find cardTypeInfo for ${cardID}`)
   }
 
@@ -205,4 +211,49 @@ function showCard (cardID, card, xdata) {
     xdata: xdata
   })
 }
-export {getNomalCmd, getCmdByState, addFields, processDetail, addName, getDetail}
+
+/**
+   * 获取卡（cardID）最后一次状态信息
+   * @param {*} cardID
+   */
+function getLastState (cardID) {
+  let cardType = parseInt(cardID.slice(0, 3), 10)
+  let xmap = getStatesMapByCardType(cardType, window.xdata)
+  return xmap && xmap.get(cardID)
+}
+
+function getInfoDef (cardType) {
+  if (!window.xdata.state.cardStore.infoDefs) { // 延迟初始化 this.infoDefs
+    let defs = window.xdata.state.metaStore.defs
+    window.xdata.commit('cardStore/initInfoDefs', {
+      vehicle: defs.vehicle,
+      staff: defs.staff
+    })
+  }
+  return window.xdata.state.cardStore.infoDefs ? window.xdata.state.cardStore.infoDefs[cardType] : null
+}
+
+// get card's last info'
+// 注意： 要求 cardID 必须是唯一的，比如：不允许出现 人卡ID 和 车卡ID 相同的情况
+function getInfo (cardID) {
+  let info = null
+
+  let cardTypeName = getCardTypeName(cardID)
+  if (!cardTypeName) {
+    if (cardID.match(/^001/)) {
+      cardTypeName = 'staff'
+    } else if (cardID.match(/^002/)) {
+      cardTypeName = 'vehicle'
+    } else if (cardID.match(/^003/)) {
+      cardTypeName = 'adhoc'
+    }
+  }
+  if (cardTypeName !== 'adhoc') {
+    info = window.xdata.state.cardStore.infos[cardTypeName + '_extend'].get(cardID)
+  } else {
+    info = window.xdata.state.cardStore.infos[cardTypeName].get(cardID)
+  }
+  return info
+}
+
+export {getNomalCmd, getCmdByState, addFields, processDetail, addName, getDetail, getLastState, getInfoDef, getInfo}

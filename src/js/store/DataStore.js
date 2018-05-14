@@ -12,6 +12,8 @@ import alarmStore from './AlarmStore.js'
 import areaStore from './AreaStore.js'
 import stateStore from './StateStore.js'
 import collectorStore from './CAndNetStatusStore.js'
+import locateStore from './LocateStore.js'
+import trackStore from './TrackStore.js'
 
 import olMapCardLayer from '../map/OlMapCardLayer.js'
 import olMapAnimator from '../map/OlMapAnimator.js'
@@ -32,6 +34,8 @@ export default new Vuex.Store({
     stateStore,
     olMapCardLayer,
     olMapAnimator,
-    collectorStore
+    collectorStore,
+    locateStore,
+    trackStore
   }
 })

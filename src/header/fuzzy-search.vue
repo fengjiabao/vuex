@@ -59,6 +59,8 @@ export default {
       position: absolute
       top: -2px
       right: 4px
+      img
+        cursor: pointer
     .popup-list
       @include wh(5rem, 4rem)
       @include flex-center-center

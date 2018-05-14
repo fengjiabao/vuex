@@ -1,5 +1,7 @@
 import ol from 'openlayers'
 import { DEAFULT_MAP_MATRIXID } from '../def/map_def.js'
+import {getLastState, getInfoDef, getInfo} from '../utils/cardStoreDep.js'
+
 const spliceLevel = 9
 export default {
   namespaced: true,
@@ -7,16 +9,27 @@ export default {
     mapID: -1,
     map: null,
     view: null,
-    workspace: null
+    workspace: null,
+    cardTips: null,
+    showCardTips: false,
+    showCardTipsID: null
   },
   mutations: {
     storeMap (state, val) {
       state.map = val.map
       state.view = val.view
+    },
+    changeCareTips (state, msg) {
+      state.cardTips = msg
+      state.showCardTips = true
+      state.showCardTipsID = msg.id
+    },
+    hideCardTips (state) {
+      state.showCardTips = false
     }
   },
   actions: {
-    initMap ({state, commit}, rows) {
+    initMap ({state, commit, dispatch}, rows) {
       console.log(rows)
       let mapID = rows.id
       let mapDef = rows.map
@@ -104,6 +117,20 @@ export default {
         })
       }
       let olmap = new ol.Map(m)
+
+      let zoomslider = new ol.control.ZoomSlider()
+      let ele = document.createElement('div')
+      let img = document.createElement('img')
+      img.src = '../../../static/image/north.png'
+      ele.innerHTML = img
+      document.querySelector('.ol-compass').innerText = ''
+      let resetNorth = new ol.control.Rotate({
+        autoHide: false,
+        label: img
+      })
+      olmap.addControl(zoomslider)
+      olmap.addControl(resetNorth)
+
       olmap.on('pointermove', function (e) {
         let pixel = olmap.getEventPixel(e.originalEvent)
         let hit = olmap.hasFeatureAtPixel(pixel)
@@ -114,7 +141,45 @@ export default {
         map: olmap,
         view: view
       })
+
+      olmap.addEventListener('click', (evt) => {
+        let feature = olmap.forEachFeatureAtPixel(evt.pixel, (feature) => feature)
+        if (feature) {
+          let type = feature.getProperties()['data-type']
+          switch (type) {
+            case 'card':
+              dispatch('showTips', {
+                evt: evt,
+                feature: feature
+              })
+          }
+        }
+      })
+
       this.commit('olMapCardLayer/initLayers')
+    },
+    showTips ({state, commit}, data) {
+      let feature = data.feature
+      let id = feature.get('data-id')
+      let subtype = feature.get('data-subtype')
+      let cardCurrentState = getLastState(id)
+      let cardStateDef = this.state.cardStore.stateDefs[subtype]
+      let msg = {
+        id: id,
+        cardtype: subtype,
+        event: data.evt,
+        // 以下数据，直接放到 tooltips 中处理，当需要使用时才获取
+        state: { // 当前状态
+          def: cardStateDef,
+          rec: cardCurrentState
+        },
+        info: { // TODO 基础信息，需根据 card_type_id 关联对应的 vechicle 表或 staff 表
+          def: getInfoDef(subtype),
+          rec: getInfo(id, subtype)
+        },
+        curTitleType: this.mapType
+      }
+      commit('changeCareTips', msg)
     }
   }
 }

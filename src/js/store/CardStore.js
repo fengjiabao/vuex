@@ -1,7 +1,8 @@
 import { toJson } from '../utils/utils.js'
 import { CARD } from '../def/state.js'
-import {addFields, getCmdByState, addName, processDetail} from '../utils/cardStoreDep.js'
+import {addName, processDetail} from '../utils/cardStoreDep.js'
 import {OD} from '../def/odef.js'
+import cardStateDef from '../def/card_state_def.js'
 
 export default {
   namespaced: true,
@@ -15,7 +16,10 @@ export default {
     overview: {},
     averageUpdateDuration: 1000,
     lastUpdateTime: 0,
-    stat: null
+    stat: null,
+    stateDefs: cardStateDef,
+    infoDefs: null,
+    infos: new Map()
   },
   mutations: {
     updateRefreshDuration (state) {
@@ -55,6 +59,14 @@ export default {
       }
       state.stat = data && data[statType]
       state.stat = addName(state.stat, statType, xdata)
+    },
+    initInfoDefs (state, msg) {
+      state.infoDefs = msg
+    },
+    cardInfoUpdate (state, msg) {
+      if (msg !== undefined) {
+        state.infos[msg.type] = msg.data
+      }
     }
   },
   actions: {
