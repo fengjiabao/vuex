@@ -42,6 +42,18 @@ export default {
             data: data
           })
           break
+        case 'CALL-REMOTE':
+          dispatch('sendMsg', {
+            cmd: EVT.CALL,
+            data: data
+          })
+          break
+        case 'CALL-CARD-START':
+          dispatch('sendMsg', {
+            cmd: EVT.CALL,
+            data: data
+          })
+          break
       }
     },
     getRept (state, data) {

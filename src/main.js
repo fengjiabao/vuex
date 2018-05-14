@@ -7,6 +7,9 @@ import router from './router'
 import Vuex from 'vuex'
 import store from './js/store/DataStore.js'
 import Transer from './js/Transer.js'
+import Draggable from './js/utils/Draggable.js'
+import toggleLocating from './js/service/locateService.js'
+import toggleTracking from './js/service/TrackService.js'
 
 // import Icon from 'vue-svg-icon/Icon.vue'
 // import Icon from 'vue-svg-icon/Icon.vue'
@@ -32,8 +35,29 @@ function initBaseServices () {
   window.xdata.dispatch('dexieDBStore/openLocalDB')
 }
 
+function initTools () {
+  window.setDraggable = (msg) => {
+    Draggable(msg.target, msg.handle)
+  }
+  // set dialog draggable
+  window.setDialogDraggable = (root) => {
+    let dragHandle = root.querySelector('.dlg-head')
+    let dragTarget = root.querySelector('.dlg-window')
+    Draggable(dragTarget, dragHandle)
+  }
+
+  window.toggleLocating = (msg) => {
+    toggleLocating(msg)
+  }
+
+  window.toggleTracking = (msg) => {
+    toggleTracking(msg)
+  }
+}
+
 window.initApp = () => {
   initBaseServices()
+  initTools()
 }
 
 window.initApp()

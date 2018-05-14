@@ -82,4 +82,69 @@ function formatElapsedTime (ms) {
   return shh + ':' + smm + ':' + sss
 }
 
-export {dealSpecialId, toJson, concatObject, formatElapsedTime}
+// 判断各种浏览器，找到正确的进入全屏的方法
+// element : 需要全屏的 node
+function requestFullScreen (element) {
+  let requestMethod = element.requestFullScreen || // W3C
+        element.webkitRequestFullScreen || // Chrome等
+        element.mozRequestFullScreen || // FireFox
+        element.msRequestFullScreen // IE11
+  if (requestMethod) {
+    requestMethod.call(element)
+  }
+}
+
+// 判断各种浏览器，找到正确的退出全屏的方法
+function exitFullScreen () {
+  let exitMethod = document.cancelFullScreen || // W3C
+        document.webkitCancelFullScreen || // Chrome等
+        document.mozCancelFullScreen || // FireFox
+        document.msExitFullscreen // IE11
+  if (exitMethod) {
+    exitMethod.call(document)
+  }
+}
+
+// 取消呼叫
+function cancelCallCard (readers, cards, userName) {
+  let message = {
+    cmd: 'call_card_cancel_req',
+    data: {
+      call_type_id: 0,
+      user_name: userName,
+      call_time: new Date().getTime(),
+      stations: readers,
+      cards: cards
+    }
+  }
+  return message
+}
+
+// 呼叫
+function callCards (type, time, userName) {
+  let message = null
+  if (type === 1) {
+
+  } else {
+    message = { // 一键撤离(全员呼叫)，紧急呼叫2
+      cmd: 'call_card_req',
+      data: {
+        call_type_id: 0,
+        call_time_out: 5,
+        call_level_id: 2,
+        user_name: userName,
+        call_time: new Date().getTime(),
+        stations: [{
+          stationid: 0
+        }],
+        cards: [{
+          cardid: '0',
+          cardtype: 1
+        }]
+      }
+    }
+  }
+  return message
+}
+
+export {dealSpecialId, toJson, concatObject, formatElapsedTime, requestFullScreen, exitFullScreen, cancelCallCard, callCards}

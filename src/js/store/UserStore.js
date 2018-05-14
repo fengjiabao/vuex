@@ -1,4 +1,5 @@
 import Socket from '../Socket.js'
+import {EVT, CMD} from '../Protocol.js'
 export default {
   namespaced: true,
   state: {
@@ -8,7 +9,11 @@ export default {
     deptID: null,
     sock: null,
     data: null,
-    logined: false
+    logined: false,
+    changePwd: {
+      code: 3,
+      msg: null
+    }
   },
   mutations: {
     getuserData (state, msg) {
@@ -16,6 +21,10 @@ export default {
       state.username = msg.name
       state.roleID = msg.roleid
       state.deptID = msg.deptid
+    },
+    doModifyPwdRes (state, data) {
+      state.changePwd.msg = data.msg
+      state.changePwd.code = data.code
     }
   },
   actions: {
@@ -23,6 +32,9 @@ export default {
       switch (msg.cmd) {
         case 'LOGIN':
           state.dispatch('login', msg.data)
+          break
+        case 'MODIFY_PWD':
+          state.dispatch('modifyPwd', msg.data)
           break
       }
     },
@@ -78,6 +90,19 @@ export default {
       } else {
         console.warn('LOGIN ： 系统错误！')
       }
+    },
+    modifyPwd ({state, commit}, msg) {
+      // console.log(msg)
+      this.sock.socket.emit(EVT.USER, {
+        cmd: CMD.USER.MODIFY,
+        data: {
+          username: msg.username,
+          oldpwd: msg.oldpwd,
+          newpwd: msg.newpwd
+        }
+      }, (data) => {
+        commit('doModifyPwdRes', data)
+      })
     }
   }
 }

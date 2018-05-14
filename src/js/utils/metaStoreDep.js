@@ -25,6 +25,7 @@ function getCardTypeInfo (state, cardID) {
 }
 
 function getCardTypeName (state, cardID) {
+  state = window.xdata.state.metaStore
   let typeInfo = getCardTypeInfo(state, cardID)
   return typeInfo ? typeInfo.name : undefined
 }
@@ -74,6 +75,7 @@ function getCurrentShiftID () {
    * @return {[type]}                   [description]
    */
 function getNameByID (idFieldName, idFieldValue, xdata) {
+  xdata = window.xdata
   let fieldName = 'name'
   if (idFieldName === 'device_type_id' || idFieldName === 'card_type_id') {
     fieldName = 'detail' // device 和 card 的描述字段是 'detail'
@@ -187,7 +189,39 @@ function getPositionDesc (landmarkID, directionID, distance, xdata) {
 }
 
 function getVehicleDriver (vehicleNumber, xdata) {
-  return xdata.state.metaStore.driverData && xdata.state.metaStore.driverData.get(vehicleNumber)
+  return window.xdata.state.metaStore.driverData && window.xdata.state.metaStore.driverData.get(vehicleNumber)
 }
 
-export {getCardBindObjectInfo, getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo, getCurrentShiftID, getNameByID, formatStateArray, getVehicleDriver}
+function formatRecord (def, row, rule) { // rule: SHORT-DATE or not, etc.
+  if (!def || !row) {
+    return row
+  }
+  let name = def.name
+  let basicExtend = null
+  let basic = formatLoop(def, row, rule)
+  if (name === 'staff' || name === 'vehicle') { // 车辆和人员 需要基础表信息和业务表信息拼起来 组成完整信息
+    basicExtend = formatLoop(window.xdata.state.metaStore.defs[name + '_extend'], row, rule)
+  }
+  return concatObject(basic, basicExtend)
+}
+
+function formatLoop (def, row, rule) {
+  let ret = {}
+  for (let i = 0; i < def.fields.names.length; i++) {
+    let name = def.fields.names[i]
+
+    if (i === def.keyIndex) { // key 不做转换
+      ret[name] = row[name]
+      continue
+    }
+
+    let type = def.fields.types[i]
+    let value = row[name]
+    value = formatField(name, value, type, rule)
+
+    ret[name] = value
+  }
+  return ret
+}
+
+export {getCardBindObjectInfo, getCardTypeName, getCardTypeInfo, getCardTypeID, getCardInfo, getCurrentShiftID, getNameByID, formatStateArray, getVehicleDriver, formatRecord}

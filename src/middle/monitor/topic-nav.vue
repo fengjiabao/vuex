@@ -1,7 +1,7 @@
 <template>
   <div class="topic-nav">
     <!-- router-link绑定事件，需要用.native -->
-    <router-link :class="item.class" v-for="item in listSwitcher" :key="item.index" :id="item.name" :aria-label="item.switchItem" @click.native="switchPanel" :ref="item.name" :to="item.path">
+    <router-link class="hint--right" v-for="item in listSwitcher" :key="item.index" :id="item.name" :aria-label="item.label" @click.native="switchPanel" :ref="item.name" :to="item.path">
       <svg class="icon"><use :xlink:href="'#' + item.iconName"></use></svg>
     </router-link>
   </div>
