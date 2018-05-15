@@ -115,14 +115,8 @@ export default {
     showDetail () {
       this.subRows = this.rows.slice(0, this.PAGE_SIZE)
       let count = this.subRows.length
-      for (let i = 0; i < count; i++) {
-        let row = this.subRows[i]
-        // let areaID = this.subRows[i][10]
-        this.subRows[i] = this.type === 'device' ? formatRecordArray(this.def, row, 'SHORT-DATE') : formatStateArray(this.def, row, 'SHORT-DATE', xdata)
-        // this.subRows[i].push(this.isSpecialArea(areaID))
-      }
-      console.log('this.subRow', this.subRows)
-      this.initPagination() // todo
+      this.changeRowView(count)
+      this.initPagination()
     },
     initPagination () {
       this.rowCount = this.rows ? this.rows.length : 0
@@ -137,6 +131,24 @@ export default {
     },
     hide () {
       this.$store.commit('stateStore/changeShowDetailDialog')
+    },
+    pageIndexChange (msg) {
+      console.log(msg)
+      this.pageIndex = msg.pageIndex
+      let start = this.pageIndex * this.PAGE_SIZE
+      let end = start + this.PAGE_SIZE
+      this.subRows = this.rows && this.rows.slice(start, end)
+
+      let count = this.subRows.length
+      this.changeRowView(count)
+    },
+    changeRowView (count) {
+      for (let i = 0; i < count; i++) {
+        let row = this.subRows[i]
+        // let areaID = this.subRows[i][10]
+        this.subRows[i] = this.type === 'device' ? formatRecordArray(this.def, row, 'SHORT-DATE') : formatStateArray(this.def, row, 'SHORT-DATE', xdata)
+        // this.subRows[i].push(this.isSpecialArea(areaID))
+      }
     }
   },
   components: {
